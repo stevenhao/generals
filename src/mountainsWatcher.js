@@ -120,7 +120,7 @@ var MountainsWatcher = (function() {
                 // if more than one general is captured, it is ambiguous and we mark those cells white
                 if (newDeadGenerals.length > 1) {
                     newDeadGenerals.map(idx => cells[idx]).forEach(markCellWhite);
-                } else {
+                } else if (newDeadGenerals.length == 1) {
                     if (getTurn() in quit_turns) { // new dead general was due to someone leaving the game 25 turns earlier
                         newDeadGenerals.map(idx => cells[idx]).forEach(markCellWhite);
                     } else {
@@ -137,19 +137,23 @@ var MountainsWatcher = (function() {
         var num_messages = 0;
         
         watchMessagesIntvl = setInterval(function() {
-            var re = /(.+)\squit\./;
-            var messages = document.getElementsByClassName('chat-messages-container')[0].children;
-            
-            for (var i = num_messages; i < messages.length; i++) {
-                if (messages[i].className === 'chat-message server-chat-message') {
-                    var matches = re.exec(messages[i].innerHTML);
-                    if (matches && matches[1] in colors) {
-                        quit_turns[parseInt(getTurn()) + 25] = true;
-                    }
-               }
+            try {
+                var re = /(.+)\squit\./;
+                var messages = document.getElementsByClassName('chat-messages-container')[0].children;
+
+                for (var i = num_messages; i < messages.length; i++) {
+                    if (messages[i].className === 'chat-message server-chat-message') {
+                        var matches = re.exec(messages[i].innerHTML);
+                        if (matches && matches[1] in colors) {
+                            quit_turns[parseInt(getTurn()) + 25] = true;
+                        }
+                   }
+                }
+
+                num_messages = messages.length;
+            } catch(ex) {
+                stop();
             }
-            
-            num_messages = messages.length;
         }, 500);
     }
 
