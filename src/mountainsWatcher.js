@@ -29,7 +29,18 @@ var MountainsWatcher = (function() {
         return result;
     }
 
-    var colors = {};
+    var colors = Object.create(null);
+    
+    // green looks too similar to darkgreen lol
+    function colorFilter(color) {
+        if (color == 'green') {
+            return 'limegreen';
+        } else if (color == 'darkgreen') {
+            return '#004d00';
+        } else {
+            return color;
+        }
+    }
     
     function markCellWhite(cell) {
         cell.style.outline = '3px dashed white';
@@ -45,16 +56,21 @@ var MountainsWatcher = (function() {
         var re = /(.+)\scaptured\s(.+)\./;
         for (var i = messages.length - 1; i >= 0; i--) {
             var matches = re.exec(messages[i].innerHTML);
-            if (matches && colors.hasOwnProperty(matches[1])) {
-                return colors[matches[1]];
+            if (matches && matches[1] in colors) {
+                return colorFilter(colors[matches[1]]);
             }
         }
 
         // something went wrong, default to white
         return 'white';
     }
+    
+    function getTurn() {
+        return document.getElementById('turn-counter').innerText.split(' ')[1];
+    }
 
     var watchIntvl = 0;
+    var watchMessagesIntvl = 0;
 
     function start() {
         if (watchIntvl) {
@@ -66,10 +82,16 @@ var MountainsWatcher = (function() {
             
             // get player colors
             var lb = document.getElementsByClassName('leaderboard-name');
+            
             for (var i = 0; i < lb.length; i++) {
                 var player = lb[i].innerHTML;
                 var classes = lb[i].className.split(/[ ]+/);
-                colors[player] = classes[classes.length - 1];
+                
+                if (player in colors) { // duplicate player name, use white
+                    colors[player] = 'white';
+                } else {
+                    colors[player] = classes[classes.length - 1];
+                }
             }
             
             console.log('initial mountains: ', initialMountains);
@@ -99,16 +121,41 @@ var MountainsWatcher = (function() {
                 if (newDeadGenerals.length > 1) {
                     newDeadGenerals.map(idx => cells[idx]).forEach(markCellWhite);
                 } else {
-                    newDeadGenerals.map(idx => cells[idx]).forEach(markCell);
+                    if (getTurn() in quit_turns) { // new dead general was due to someone leaving the game 25 turns earlier
+                        newDeadGenerals.map(idx => cells[idx]).forEach(markCellWhite);
+                    } else {
+                        newDeadGenerals.map(idx => cells[idx]).forEach(markCell);
+                    }
                 }
             } catch(ex) {
                 stop();
             }
         }, 500);
+        
+        // turns that will result in a dead general due to someone leaving
+        var quit_turns = Object.create(null);
+        var num_messages = 0;
+        
+        watchMessagesIntvl = setInterval(function() {
+            var re = /(.+)\squit\./;
+            var messages = document.getElementsByClassName('chat-messages-container')[0].children;
+            
+            for (var i = num_messages; i < messages.length; i++) {
+                if (messages[i].className === 'chat-message server-chat-message') {
+                    var matches = re.exec(messages[i].innerHTML);
+                    if (matches && matches[1] in colors) {
+                        quit_turns[parseInt(getTurn()) + 25] = true;
+                    }
+               }
+            }
+            
+            num_messages = messages.length;
+        }, 500);
     }
 
     function stop() {
         clearInterval(watchIntvl);
+        clearInterval(watchMessagesIntvl);
         watchIntvl = 0;
         console.log('no longer watching mountains.');
     }
