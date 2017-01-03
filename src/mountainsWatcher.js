@@ -80,7 +80,9 @@ var MountainsWatcher = (function() {
         try {
             var initialMountains = getCityCells();
             
-            // get player colors
+            // reset colors first, then get player colors
+            colors = Object.create(null);
+            
             var lb = document.getElementsByClassName('leaderboard-name');
             
             for (var i = 0; i < lb.length; i++) {
