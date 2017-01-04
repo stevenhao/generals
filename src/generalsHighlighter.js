@@ -39,6 +39,7 @@ var GeneralsHighlighter = (function() {
     var watchIntvl = 0;
 
     function start() {
+      squares = [];
         if (watchIntvl) {
              stop();
         }
