@@ -66,7 +66,7 @@ var MountainsWatcher = (function() {
     }
     
     function getTurn() {
-        return document.getElementById('turn-counter').innerText.split(' ')[1];
+        return parseInt(document.getElementById('turn-counter').innerText.split(' ')[1]);
     }
 
     var watchIntvl = 0;
@@ -147,7 +147,7 @@ var MountainsWatcher = (function() {
                     if (messages[i].className === 'chat-message server-chat-message') {
                         var matches = re.exec(messages[i].innerHTML);
                         if (matches && matches[1] in colors) {
-                            quit_turns[parseInt(getTurn()) + 25] = true;
+                            quit_turns[getTurn() + 25] = true;
                         }
                    }
                 }
