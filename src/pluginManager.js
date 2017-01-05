@@ -43,24 +43,24 @@ function getCells() {
 // ==================================
 // Persistent settings using browser storage
 var Settings = (function() {
-  function get(key) {
-    return localStorage.getItem(key);
-  }
+    function get(key) {
+        return localStorage.getItem(key);
+    }
 
-  function set(key, val) {
-    localStorage.setItem(key, val);
-  }
+    function set(key, val) {
+        localStorage.setItem(key, val);
+    }
 
-  return {
-    get: get,
-    set: set,
-  };
+    return {
+        get: get,
+        set: set,
+    };
 }());
 
 var SettingNames = {
-  autorun: function(plugin) {
-    return 'autorun-' + plugin.name;
-  },
+    autorun: function(plugin) {
+        return 'autorun-' + plugin.name;
+    },
 };
 
 
@@ -102,16 +102,16 @@ var Generals = (function() {
         checkbox.type = 'checkbox';
         checkbox.checked = Settings.get(autorunSetting) === 'on';
         checkbox.onchange = function() {
-          Settings.set(autorunSetting, checkbox.checked ? 'on' : 'off');
+            Settings.set(autorunSetting, checkbox.checked ? 'on' : 'off');
         };
 
         // autorun the plugin
         setInterval(function() {
-          if (Settings.get(autorunSetting) === 'on') {
-            if (!plugin.running()) {
-              plugin.start();
+            if (Settings.get(autorunSetting) === 'on') {
+                if (!plugin.running()) {
+                    plugin.start();
+                }
             }
-          }
         }, 1000);
 
         dashboard.appendChild(button);

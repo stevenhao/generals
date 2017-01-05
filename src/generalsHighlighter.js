@@ -39,9 +39,9 @@ var GeneralsHighlighter = (function() {
     var watchIntvl = 0;
 
     function start() {
-      squares = [];
+        squares = [];
         if (watchIntvl) {
-             stop();
+            stop();
         }
         console.log('starting generals highligter');
 
