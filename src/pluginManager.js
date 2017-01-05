@@ -40,6 +40,29 @@ function getCells() {
     return toArray(rows).flatMap(row => toArray(row.childNodes));
 }
 
+// ==================================
+// Persistent settings using browser storage
+var Settings = (function() {
+  function get(key) {
+    return localStorage.getItem(key);
+  }
+
+  function set(key, val) {
+    localStorage.setItem(key, val);
+  }
+
+  return {
+    get: get,
+    set: set,
+  };
+}());
+
+var SettingNames = {
+  autorun: function(plugin) {
+    return 'autorun-' + plugin.name;
+  },
+};
+
 
 // ==================================
 // Putting it all together in a dashboard
@@ -52,7 +75,7 @@ var Generals = (function() {
     var mounted = false;
     var plugins = []; // the dashboard doubles as a plugin manager
     var dashboard = document.createElement('div');
-    dashboard.style.cssText = 'z-index: 11; position: absolute; right: 20px; bottom: 30px; width: 150px; height: 300px; outline: 5px solid #252525; text-align: center;';
+    dashboard.style.cssText = 'z-index: 11; position: absolute; right: 20px; bottom: 30px; width: 200px; height: 300px; outline: 5px solid #252525; text-align: center;';
     dashboard.innerHTML = '<p>#swog</p>';
 
     // only call this when Generals && Generals.ready() is true.
@@ -73,7 +96,26 @@ var Generals = (function() {
             button.style.backgroundColor = plugin.running() ? 'black' : 'white';
         }, 1000);
 
+        // draw checkbox for autorun setting
+        var autorunSetting = SettingNames.autorun(plugin);
+        var checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = Settings.get(autorunSetting) === 'on';
+        checkbox.onchange = function() {
+          Settings.set(autorunSetting, checkbox.checked ? 'on' : 'off');
+        };
+
+        // autorun the plugin
+        setInterval(function() {
+          if (Settings.get(autorunSetting) === 'on') {
+            if (!plugin.running()) {
+              plugin.start();
+            }
+          }
+        }, 1000);
+
         dashboard.appendChild(button);
+        dashboard.appendChild(checkbox);
     }
 
     function mount() {
