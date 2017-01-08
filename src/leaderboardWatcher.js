@@ -35,11 +35,20 @@ var LeaderboardWatcher = (function() {
             for (var i = 1; i < lb.rows.length; ++i) {
                 lb.rows[i].insertCell(2);
             }
-
-            army = [];
+            var army = [];
+            var army_index;
+            var player_index;
+            for (i = 0; i < lb.rows[0].cells.length; ++i) {
+                if (lb.rows[0].cells[i].innerText == 'Player') {
+                    player_index = i;
+                }
+                if (lb.rows[0].cells[i].innerText == 'Army') {
+                    army_index = i;
+                }
+            }
             for (i = 1; i < lb.rows.length; ++i) {
-                var name= lb.rows[i].cells[1].innerText;
-                army[name] = parseInt(lb.rows[i].cells[3].innerText);
+                var name= lb.rows[i].cells[player_index].className;
+                army[name] = parseInt(lb.rows[i].cells[army_index].innerText);
             }
             console.log('watching leaderboard...');
         } catch (ex) {
@@ -53,8 +62,8 @@ var LeaderboardWatcher = (function() {
             try {
                 if (getTurn() != curTurn) {
                     for (var i = 1; i < lb.rows.length; ++i) {
-                        var name= lb.rows[i].cells[1].innerText;
-                        var new_army = parseInt(lb.rows[i].cells[3].innerText);
+                        var name= lb.rows[i].cells[player_index].className;
+                        var new_army = parseInt(lb.rows[i].cells[army_index].innerText);
                         var delta = new_army - army[name];
                         if (delta > 0) {
                             lb.rows[i].cells[2].style.backgroundColor = 'yellowgreen';
