@@ -1,6 +1,6 @@
 # generals
 
-A collection of scripts for the game <generals.io>.
+A collection of scripts for the game [www.generals.io](generals.io).
 
 ## Setup with TamperMonkey
 
