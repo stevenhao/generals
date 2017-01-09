@@ -41,6 +41,13 @@ var BetterControls = (function() {
         if (h.CHAT.indexOf(e.keyCode) !== -1)
             return void this.props.focusChat();
         if (!(this.state.selectedIndex < 0)) {
+            // begin modified code
+            var curColor = this.props.map.tileAt(this.state.selectedIndex);
+            console.log('checking curColor', curColor, this.props.playerIndex, this.props.teams);
+            if (!(curColor === this.props.playerIndex || (curColor !== -1 && this.props.teams && this.props.teams[s] === this.props.teams[curColor]))) {
+                return;
+            }
+            // end modified code
             var t = Math.floor(this.state.selectedIndex / this.props.map.width)
               , n = this.state.selectedIndex % this.props.map.width
               , r = 0
