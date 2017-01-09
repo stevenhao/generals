@@ -23,3 +23,13 @@ The script may look something like this:
 // @require file://path/to/repo/src/PluginsManager.js
 // ==/UserScript==
 ```
+
+### Experimental Features
+
+To enable experimental features, you must
+- block the execution of generals-prod.js.
+- load the modified version (src/generals-prod-modified.js)
+
+You can use TamperMonkey to load generals-prod-modified as usual.
+
+You can use AdBlock to block generals-prod.js: add the line `generals-bundle-prod-v9.0.js` to your filters, in AdBlock options.
