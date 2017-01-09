@@ -1,10 +1,10 @@
 # generals
 
-A collection of scripts for the game [www.generals.io](generals.io).
+A collection of scripts for the game [generals.io](www.generals.io).
 
 ## Setup with TamperMonkey
 
-[http://tampermonkey.net/](TamperMonkey) is a Chrome Extension that automatically runs scripts on webpages.
+[TamperMonkey](http://tampermonkey.net/) is a Chrome Extension that automatically runs scripts on webpages.
 
 Install the extension and add the scripts (copy-paste the whole script into the editor) using TamperMonkey's dashboard.
 
@@ -23,6 +23,7 @@ The script may look something like this:
 // @require file://path/to/repo/src/PluginsManager.js
 // ==/UserScript==
 ```
+You'll also need to give Tampermonkey access to your file system by checking the box "Allow access to file URLs" (which is next to "Allow in incognito) in Chrome's extensions page (chrome://extensions).
 
 ### Experimental Features
 
