@@ -18360,6 +18360,8 @@ console.log('Running modified generals-prod.js');
             console.log('window.GameMap is available');
             window.GameMap = this;
             window.u = u;
+            window.n = n;
+            window.s = s;
             window.c = c;
             window.v = v;
             window.l = l;
