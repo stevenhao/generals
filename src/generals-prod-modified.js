@@ -18361,6 +18361,7 @@ console.log('Running modified generals-prod.js');
             window.GameMap = this;
             window.u = u;
             window.c = c;
+            window.s = s;
             window.v = v;
             window.l = l;
             window.h = h;
