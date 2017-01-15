@@ -16,8 +16,9 @@
 
 var BetterControls = (function() {
     var running = false;
-    // grabbed from original generals-prod.js
-    function onKeyDown(e) {
+
+    var FIFTY = [16]; // shiftleft
+    function onKeyDown(e, t) {
         if (h.ZOOMIN.indexOf(e.keyCode) !== -1)
             return void (this.state.zoom > d && this.setState({
                 zoom: this.state.zoom - 1
@@ -29,8 +30,8 @@ var BetterControls = (function() {
         if (this.props.isReplay)
             return void (h.AUTOPLAY.indexOf(e.keyCode) !== -1 ? this.props.toggleAutoPlay() : h.RIGHT.indexOf(e.keyCode) !== -1 ? l.nextReplayTurn() : h.LEFT.indexOf(e.keyCode) !== -1 && l.backReplay());
         if (e.preventDefault(),
-        e.stopPropagation(),
-        h.UNDO.indexOf(e.keyCode) !== -1)
+            e.stopPropagation(),
+            h.UNDO.indexOf(e.keyCode) !== -1)
             return void this.undoQueuedAttack();
         if (h.CLEAR.indexOf(e.keyCode) !== -1)
             return void this.clearQueuedAttacks();
@@ -41,17 +42,13 @@ var BetterControls = (function() {
         if (h.CHAT.indexOf(e.keyCode) !== -1)
             return void this.props.focusChat();
         if (!(this.state.selectedIndex < 0)) {
-            // begin modified code
-            var curColor = this.props.map.tileAt(this.state.selectedIndex);
-            console.log('checking curColor', curColor, this.props.playerIndex, this.props.teams);
-            if (!(curColor === this.props.playerIndex || (curColor !== -1 && this.props.teams && this.props.teams[s] === this.props.teams[curColor]))) {
-                return;
-            }
-            // end modified code
             var t = Math.floor(this.state.selectedIndex / this.props.map.width)
-              , n = this.state.selectedIndex % this.props.map.width
-              , r = 0
-              , o = 0;
+                , n = this.state.selectedIndex % this.props.map.width
+                , r = 0
+                , o = 0;
+            if (FIFTY.indexOf(e.keyCode) !== -1)
+                this.setState({selectedIs50: !this.state.selectedIs50});
+            
             if (h.LEFT.indexOf(e.keyCode) !== -1)
                 o = -1;
             else if (h.UP.indexOf(e.keyCode) !== -1)
@@ -64,30 +61,69 @@ var BetterControls = (function() {
                 r = 1
             }
             var i = t + r
-              , a = n + o
-              , s = this.props.map.tileAt(this.props.map.indexFrom(i, a));
+                , a = n + o
+                , s = this.props.map.tileAt(this.props.map.indexFrom(i, a));
             s !== u.TILE_MOUNTAIN ? (this.onTileClick(i, a),
-            (s === this.props.playerIndex || this.props.teams && this.props.teams[s] === this.props.teams[this.props.playerIndex]) && this.onTileClick(i, a),
-            c.onWASD && c.onWASD()) : this.setState({
-                selectedIndex: -1
-            });
-
-            console.log('doing wasd');
-            // begin modified code
-            if (running && s !== u.TILE_MOUNTAIN) {
-                this.setState({ selectedIndex: this.props.map.indexFrom(i, a) });
-            }
-            // end modified code
-
+                (s === this.props.playerIndex || this.props.teams && this.props.teams[s] === this.props.teams[this.props.playerIndex]) && this.onTileClick(i, a),
+                c.onWASD && c.onWASD()) : this.setState({
+                    selectedIndex: -1
+                })
         }
-    };
+    }
 
+    function onTileClick(e, t) {
+        var n = this.props.map;
+        if (!(e < 0 || t < 0 || e >= n.height || t >= n.width)) {
+            var r = n.indexFrom(e, t);
+            if (this.state.selectedIndex < 0)
+                this.setState({
+                    selectedIndex: n.indexFrom(e, t),
+                    selectedIs50: !1
+                });
+            else if (this.state.selectedIndex === r)
+                this.state.selectedIs50 ? this.setState({
+                    selectedIndex: -1
+                }) : this.setState({
+                    selectedIs50: !0
+                });
+            else {
+                 // begin modified code
+                 var curColor = this.props.map.tileAt(this.state.selectedIndex);
+                 if (!(curColor === this.props.playerIndex || (curColor !== -1 && this.props.teams && this.props.teams[s] === this.props.teams[curColor]))) {
+                     return;
+                 }
+                 // end modified code
+                var o = {
+                    selectedIndex: -1
+                };
+                //begin modified code
+                o.selectedIndex = r;
+                o.selectedIs50 = 0;
+                //end modified code
+                if (n.isAdjacent(r, this.state.selectedIndex) && r !== this.state.selectedIndex) {
+                    var i = this.state.selectedIndex;
+                    s.attack(i, r, this.state.selectedIs50, this.state.attackIndex);
+                    Object.assign(o, {
+                        queuedAttacks: this.state.queuedAttacks.concat([{
+                            attackIndex: this.state.attackIndex,
+                            begin: i,
+                            end: r
+                        }]),
+                        attackIndex: this.state.attackIndex + 1
+                    })
+                }
+                this.setState(o)
+            }
+        }
+    }
     function start() {
         if (running) return; // already runnnig
         if (!window.GameMap) return; // not running modified code
+
         window.removeEventListener("keydown", window.GameMap.onKeyDown)
         window.GameMap.onKeyDown = onKeyDown.bind(window.GameMap);
         window.addEventListener("keydown", window.GameMap.onKeyDown)
+        window.GameMap.onTileClick = onTileClick;
         running = true;
     }
     function stop() {
