@@ -18691,17 +18691,18 @@ console.log('Running modified generals-prod.js');
             this.forceUpdate()
         },
         componentDidMount: function() {
+            if(true) {
             // Begin Modified Code
             console.log('window.GameMap is available');
             window.GameMap = this;
-            window.u = u;
-            window.c = c;
-            window.s = s;
-            window.d = d;
-            window.v = v;
-            window.l = l;
-            window.h = h;
-            // End Modified Code
+             window.y = y;
+             window.u = u;
+             window.b = b;
+             window.h = h;
+             window.c = c;
+             window.s = s;
+              // End Modified Code
+            }
             window.addEventListener("keydown", this.onKeyDown)
         },
         componentWillUnmount: function() {

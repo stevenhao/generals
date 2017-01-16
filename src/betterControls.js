@@ -19,20 +19,27 @@ var BetterControls = (function() {
     var myGameMap = null;
 
     var FIFTY = [16]; // shiftleft
-    function onKeyDown(e, t) {
+    function onKeyDown(e) {
+        if (this.state.inPingMode)
+            return void this.disablePingMode();
         if (h.ZOOMIN.indexOf(e.keyCode) !== -1)
-            return void (this.state.zoom > d && this.setState({
+            return void (this.state.zoom > y && this.setState({
                 zoom: this.state.zoom - 1
             }));
         if (h.ZOOMOUT.indexOf(e.keyCode) !== -1)
-            return void (this.state.zoom < v && this.setState({
+            return void (this.state.zoom < b && this.setState({
                 zoom: this.state.zoom + 1
             }));
         if (this.props.isReplay)
             return void (h.AUTOPLAY.indexOf(e.keyCode) !== -1 ? this.props.toggleAutoPlay() : h.RIGHT.indexOf(e.keyCode) !== -1 ? l.nextReplayTurn() : h.LEFT.indexOf(e.keyCode) !== -1 && l.backReplay());
         if (e.preventDefault(),
-            e.stopPropagation(),
-            h.UNDO.indexOf(e.keyCode) !== -1)
+        e.stopPropagation(),
+        h.PING.indexOf(e.keyCode) !== -1) {
+            if (!f.hasDuplicate(this.props.teams))
+                return;
+            return void this.enablePingMode()
+        }
+        if (h.UNDO.indexOf(e.keyCode) !== -1)
             return void this.undoQueuedAttack();
         if (h.CLEAR.indexOf(e.keyCode) !== -1)
             return void this.clearQueuedAttacks();
@@ -41,15 +48,14 @@ var BetterControls = (function() {
                 selectedIndex: -1
             });
         if (h.CHAT.indexOf(e.keyCode) !== -1)
-            return void this.props.focusChat();
+            return void this.props.focusChat(!1);
+        if (h.TEAMCHAT.indexOf(e.keyCode) !== -1)
+            return void this.props.focusChat(!0);
         if (!(this.state.selectedIndex < 0)) {
             var t = Math.floor(this.state.selectedIndex / this.props.map.width)
-                , n = this.state.selectedIndex % this.props.map.width
-                , r = 0
-                , o = 0;
-            if (FIFTY.indexOf(e.keyCode) !== -1) {
-                this.setState({selectedIs50: !this.state.selectedIs50});
-            }
+              , n = this.state.selectedIndex % this.props.map.width
+              , r = 0
+              , o = 0;
             if (h.LEFT.indexOf(e.keyCode) !== -1)
                 o = -1;
             else if (h.UP.indexOf(e.keyCode) !== -1)
@@ -62,15 +68,20 @@ var BetterControls = (function() {
                 r = 1
             }
             var i = t + r
-                , a = n + o
-                , s = this.props.map.tileAt(this.props.map.indexFrom(i, a));
+              , a = n + o
+              , s = this.props.map.tileAt(this.props.map.indexFrom(i, a));
             s !== u.TILE_MOUNTAIN ? (this.onTileClick(i, a),
-                // previously, there was another onTileClick(i, a) call.. this is no longer necessary as our onTileClick will auto-select (i,a)
-                c.onWASD && c.onWASD()) : this.setState({
-                    //begin modified code
-                    //selectedIndex: -1,
-                    // end modified code
-                })
+                (s === this.props.playerIndex || this.props.teams && this.props.teams[s] === this.props.teams[this.props.playerIndex]) &&
+                // begin modified code
+                true,
+                //this.onTileClick(i, a),
+                //end modified code
+
+            c.onWASD && c.onWASD()) : this.setState({
+                // begin modified code
+                // selectedIndex: -1
+                //end modified code
+            })
         }
     }
 
