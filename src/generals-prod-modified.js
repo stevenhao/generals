@@ -48,7 +48,7 @@ console.log('Running modified generals-prod.js');
     ;
     var r = (n(1),
     n(2));
-    n(322);
+    n(324);
     var o = n(265)
       , i = n(176)
       , a = n(3)
@@ -75,7 +75,7 @@ console.log('Running modified generals-prod.js');
 , function(e, t) {
     "use strict";
     e.exports = {
-        VERSION: "9.0",
+        VERSION: "10.2",
         PLAYER_CAP: 8,
         PLAYER_COLORS: ["red", "blue", "green", "purple", "teal", "darkgreen", "orange", "maroon"],
         MAX_USERNAME_LENGTH: 16,
@@ -86,14 +86,13 @@ console.log('Running modified generals-prod.js');
         RECRUIT_RATE: 2,
         FARM_RATE: 50,
         MIN_GENERAL_SPACING: 9,
-        MAX_ALLY_SPACING: 14,
-        MAX_ALLY_SPACING_LOOSE: 15,
-        MIN_ALLY_SPACING: 4,
-        MIN_ALLY_SPACING_LOOSE: 3,
-        ALLY_LOOSE_THRESHOLD: 4,
+        MAX_ALLY_SPACING: 12,
+        MIN_ALLY_SPACING: 3,
         CLOSE_CITY_DISTANCE: 6,
         TIMEOUT_CAPTURE_AFK: 25e3,
-        CUSTOM_GAME_URL_LENGTH: 4
+        CUSTOM_GAME_URL_LENGTH: 4,
+        PING_DURATION: 2e3,
+        TEAMS_2V2: [0, 0, 1, 1]
     }
 }
 , function(e, t, n) {
@@ -103,10 +102,10 @@ console.log('Running modified generals-prod.js');
       , i = n(176)
       , a = n(177)
       , s = n(178)
-      , u = n(309)
-      , c = n(312)
-      , l = n(316)
-      , p = n(321)
+      , u = n(311)
+      , c = n(314)
+      , l = n(318)
+      , p = n(323)
       , h = r.createClass({
         displayName: "App",
         render: function() {
@@ -320,7 +319,7 @@ console.log('Running modified generals-prod.js');
     };
     e.exports = S
 }
-, [323, 8], function(e, t) {
+, [325, 8], function(e, t) {
     "use strict";
     function n(e) {
         for (var t = arguments.length - 1, n = "Minified React error #" + e + "; visit http://facebook.github.io/react/docs/error-decoder.html?invariant=" + e, r = 0; r < t; r++)
@@ -2440,7 +2439,7 @@ console.log('Running modified generals-prod.js');
     i.addPoolingTo(r),
     e.exports = r
 }
-, [323, 36], function(e, t, n) {
+, [325, 36], function(e, t, n) {
     "use strict";
     function r() {
         return !i && o.canUseDOM && (i = "textContent"in document.documentElement ? "textContent" : "innerText"),
@@ -3998,7 +3997,7 @@ console.log('Running modified generals-prod.js');
         topVolumeChange: "volumechange",
         topWaiting: "waiting"
     }
-      , X = {
+      , q = {
         area: !0,
         base: !0,
         br: !0,
@@ -4015,14 +4014,14 @@ console.log('Running modified generals-prod.js');
         track: !0,
         wbr: !0
     }
-      , q = {
+      , X = {
         listing: !0,
         pre: !0,
         textarea: !0
     }
       , Y = v({
         menuitem: !0
-    }, X)
+    }, q)
       , z = /^[a-zA-Z][a-zA-Z:_\.\-\d]*$/
       , Q = {}
       , J = {}.hasOwnProperty
@@ -4099,7 +4098,7 @@ console.log('Running modified generals-prod.js');
             } else {
                 var S = this._createOpenTagMarkupAndPutListeners(e, i)
                   , A = this._createContentMarkup(e, i, r);
-                h = !A && X[this._tag] ? S + "/>" : S + ">" + A + "</" + this._currentElement.type + ">"
+                h = !A && q[this._tag] ? S + "/>" : S + ">" + A + "</" + this._currentElement.type + ">"
             }
             switch (this._tag) {
             case "input":
@@ -4155,7 +4154,7 @@ console.log('Running modified generals-prod.js');
                     r = s.join("")
                 }
             }
-            return q[this._tag] && "\n" === r.charAt(0) ? "\n" + r : r
+            return X[this._tag] && "\n" === r.charAt(0) ? "\n" + r : r
         },
         _createInitialChildren: function(e, t, n, r) {
             var o = t.dangerouslySetInnerHTML;
@@ -8421,12 +8420,13 @@ console.log('Running modified generals-prod.js');
 }
 , function(e, t) {
     "use strict";
+    var n = "__2v2__";
     e.exports = {
         isCustomGame: function(e) {
             return e && "1v1" !== e && "2v2" !== e && "main" !== e
         },
         chatRoomForCustomGame: function(e) {
-            return "chat_custom_queue_" + e;
+            return "chat_custom_queue_" + e
         },
         randomString: function(e) {
             return (Math.random().toString(36) + "00000").slice(2, e + 2)
@@ -8435,6 +8435,22 @@ console.log('Running modified generals-prod.js');
             return e && e.some(function(t, n) {
                 return e.indexOf(t) !== n
             })
+        },
+        chatRoomForTeam: function(e, t) {
+            return e.chat_room + "_team_" + t
+        },
+        originalFromTeamChatRoom: function(e) {
+            var t = e.indexOf("_team_");
+            if (!(t < 0))
+                return e.substring(0, t)
+        },
+        idFor2v2Team: function(e, t) {
+            return e < t ? e + n + t : t + n + e
+        },
+        userIdsFrom2v2Id: function(e) {
+            var t = e.indexOf(n);
+            if (!(t < 0))
+                return [e.substring(0, t), e.substring(t + n.length)]
         }
     }
 }
@@ -8451,14 +8467,16 @@ console.log('Running modified generals-prod.js');
       , p = n(297)
       , h = n(298)
       , d = n(299)
-      , f = n(288)
-      , m = n(265)
-      , v = n(300)
+      , f = n(300)
+      , m = n(288)
+      , v = n(265)
       , y = n(301)
-      , g = n(303)
-      , T = n(306)
+      , g = n(302)
+      , T = n(304)
       , b = n(307)
-      , S = r.createClass({
+      , S = n(308)
+      , E = n(310)
+      , A = r.createClass({
         displayName: "RankItem",
         render: function() {
             return this.props.stars || this.props.rank ? r.createElement("div", {
@@ -8481,7 +8499,7 @@ console.log('Running modified generals-prod.js');
             }, "Rank #", this.props.rank || 0) : null) : null
         }
     })
-      , E = r.createClass({
+      , C = r.createClass({
         displayName: "MainMenu",
         getInitialState: function() {
             return {
@@ -8494,19 +8512,16 @@ console.log('Running modified generals-prod.js');
                 username: u.username
             })) : i.findDOMNode(this.refs.username).focus(),
             h.doWhenVisible(function() {
-                v.isPrivateURL() ? this.props.joinPrivateGame.bind(this)(v.getPrivateID()) : v.isReplayURL() ? s.getReplay(v.getReplayID(), f.startReplay) : v.isTeamURL() && this.props.joinTeam.bind(this)(v.getTeamID())
+                y.isPrivateURL() ? this.props.joinPrivateGame.bind(this)(y.getPrivateID()) : y.isReplayURL() ? s.getReplay(y.getReplayID(), m.startReplay) : y.isTeamURL() && this.props.joinTeam.bind(this)(y.getTeamID())
             }
-            .bind(this)),
-            googletag.cmd.push(function() {
-                googletag.display("div-gpt-ad-1479698638527-0")
-            })
+            .bind(this))
         },
         onPlayClicked: function() {
-            return u.completed_tutorial ? s.isConnected() ? void (u.completed_tutorial ? this.setState({
+            return u && !u.completed_tutorial ? void m.startLocalTutorial(this.state.username) : s.isConnected() ? void this.setState({
                 showGameModes: !0
-            }) : this.props.onPlayFFA.call(this)) : void this.setState({
+            }) : void this.setState({
                 showNotConnected: !0
-            }) : void f.startLocalTutorial(this.state.username)
+            })
         },
         closeGameModes: function() {
             this.setState({
@@ -8552,18 +8567,20 @@ console.log('Running modified generals-prod.js');
         },
         loadMoreReplays: function() {
             var e = void 0
-              , t = m.getState().menu.replays;
+              , t = v.getState().menu.replays;
             t && t.length > 0 && (e = t[t.length - 1].started - .1),
             s.getReplayList(e)
         },
         replayRows: function() {
-            var e = m.getState().menu.replays || [];
+            var e = v.getState().menu.replays || [];
             return e.map(function(e, t) {
                 for (var n = [], o = 0; o < e.ranking.length; o++) {
                     var i = e.ranking[o];
                     n.push(r.createElement("span", {
                         key: "replay-list-p-" + o
-                    }, i.name, Number.isFinite(i.stars) ? " (★" + i.stars + ")" : "")),
+                    }, i.name + " (", r.createElement(p, {
+                        stars: i.stars
+                    }), ")")),
                     n.push(r.createElement("br", {
                         key: "replay-list-br-" + o
                     }))
@@ -8615,14 +8632,18 @@ console.log('Running modified generals-prod.js');
                 className: "main-title"
             }, "generals.io"), r.createElement("div", {
                 className: "rank-list"
-            }, r.createElement(S, {
+            }, r.createElement(A, {
                 name: "1v1",
                 stars: this.props.stars ? this.props.stars.duel : void 0,
                 rank: this.props.rank ? this.props.rank.duel : void 0
-            }), r.createElement(S, {
+            }), r.createElement(A, {
                 name: "FFA",
                 stars: this.props.stars ? this.props.stars.ffa : void 0,
                 rank: this.props.rank ? this.props.rank.ffa : void 0
+            }), r.createElement(A, {
+                name: "2v2",
+                stars: this.props.stars ? this.props.stars["2v2"] : void 0,
+                rank: this.props.rank ? this.props.rank["2v2"] : void 0
             })), r.createElement("input", {
                 style: {
                     border: "none"
@@ -8666,11 +8687,11 @@ console.log('Running modified generals-prod.js');
                 className: "bold"
             }, "Click"), " or use ", r.createElement("span", {
                 className: "bold"
-            }, "WASD"), " to move armies."), g ? null : r.createElement("p", {
+            }, "WASD"), " to move armies."), T ? null : r.createElement("p", {
                 style: {
                     fontSize: "14px"
                 }
-            }, "[Spacebar] to deselect, [Q] to clear moves, [E] to undo moves."), g ? null : r.createElement("p", {
+            }, "[Spacebar] to deselect, [Q] to clear moves, [E] to undo moves."), T ? null : r.createElement("p", {
                 style: {
                     fontSize: "14px"
                 }
@@ -8682,9 +8703,11 @@ console.log('Running modified generals-prod.js');
                 style: {
                     fontSize: "14px"
                 }
-            }, "2 clicks = move 50%")), r.createElement("div", {
+            }, "2 clicks = move 50%")), r.createElement(d, {
                 id: "main-menu-reddit-button"
-            }, r.createElement(d, null)), r.createElement("div", {
+            }), r.createElement(f, {
+                id: "main-menu-discord-button"
+            }), r.createElement("div", {
                 id: "leaderboard-button",
                 onClick: this.onLeaderboardClicked
             }, r.createElement("img", {
@@ -8716,12 +8739,10 @@ console.log('Running modified generals-prod.js');
             }, "v", c.VERSION, " (Changelog)"), r.createElement("div", {
                 id: "main-menu-leaderboard-ad",
                 className: "center-horizontal"
-            }, r.createElement("div", {
-                id: "div-gpt-ad-1479698638527-0",
-                style: {
-                    height: "90px",
-                    width: "728px"
-                }
+            }, r.createElement(E, {
+                id: "div-gpt-ad-1484365524244-0",
+                width: 728,
+                height: 90
             })), this.state.showGameModes ? r.createElement("div", {
                 className: "popup-background",
                 onClick: this.closeGameModes
@@ -8729,7 +8750,7 @@ console.log('Running modified generals-prod.js');
                 id: "game-modes",
                 className: "alert center",
                 onClick: this.ignoreClick
-            }, r.createElement("center", null, y.adBlockEnabled() ? r.createElement("p", {
+            }, r.createElement("center", null, g.adBlockEnabled() ? r.createElement("p", {
                 style: {
                     padding: "5px 0",
                     marginBottom: "15px",
@@ -8763,13 +8784,17 @@ console.log('Running modified generals-prod.js');
             }, "Team up with a friend to take down 2 opponents."), r.createElement("button", {
                 className: "inverted",
                 onClick: this.onPrivateClicked
-            }, "Custom"), r.createElement("p", null, "Create a private game.")))) : null, this.state.showLeaderboard ? r.createElement(b, {
-                allLeaderboards: m.getState().menu.leaderboards,
+            }, "Custom"), r.createElement("p", null, "Create a private game.")))) : null, this.state.showLeaderboard ? r.createElement(S, {
+                allLeaderboards: v.getState().menu.leaderboards,
+                data2v2Teammates: v.getState().menu.data2v2Teammates,
                 playerRanks: this.props.rank,
                 playerUsername: this.state.username,
                 getLeaderboard: s.getLeaderboard,
+                get2v2Teammates: s.get2v2Teammates,
                 hideLeaderboards: this.hideLeaderboards
             }) : null, this.state.showReplayList ? r.createElement("div", {
+                className: "popup-background"
+            }, r.createElement("div", {
                 className: "popup-replays"
             }, r.createElement("div", {
                 id: "replays",
@@ -8787,13 +8812,13 @@ console.log('Running modified generals-prod.js');
                 style: {
                     width: "12em"
                 }
-            }, "Time"), r.createElement("th", null, "Turns"), r.createElement("th", null, "Result"))), r.createElement("tbody", null, this.replayRows())), m.getState().menu.replaysFinished ? null : r.createElement("button", {
+            }, "Time"), r.createElement("th", null, "Turns"), r.createElement("th", null, "Result"))), r.createElement("tbody", null, this.replayRows())), v.getState().menu.replaysFinished ? null : r.createElement("button", {
                 className: "small inverted center-horizontal",
                 onClick: this.loadMoreReplays
             }, "Load More")), r.createElement("button", {
                 className: "small inverted center-horizontal",
                 onClick: this.hideReplayList
-            }, "Exit"))) : null, this.state.showChangingServers ? r.createElement("div", {
+            }, "Exit")))) : null, this.state.showChangingServers ? r.createElement("div", {
                 className: "popup-background"
             }, r.createElement("div", {
                 className: "alert center"
@@ -8805,14 +8830,19 @@ console.log('Running modified generals-prod.js');
                 }
             }, "Changing Servers..."))) : null, this.props.showRemovedFrom2v2 ? r.createElement("div", {
                 className: "popup-background"
-            }, r.createElement(T, {
+            }, r.createElement(b, {
                 title: "Removed from 2v2",
                 body: r.createElement("span", null, "Your teammate left, so you were removed from the 2v2 queue."),
                 button: "Close",
                 onClick: this.props.closeRemovedFrom2v2
+            })) : null, this.props.showNotifyServerRestart ? r.createElement("div", {
+                className: "popup-background"
+            }, r.createElement(b, {
+                title: "Server updating!",
+                body: r.createElement("span", null, "The server is restarting to include new updates to generals.io!", r.createElement("br", null), "If you were just in a game, it will be invalidated - nobody will gain or lose any stars.", r.createElement("br", null), r.createElement("br", null), "Refresh the page in a few seconds to continue playing.")
             })) : null, this.state.showNotConnected ? r.createElement("div", {
                 className: "popup-background"
-            }, r.createElement(T, {
+            }, r.createElement(b, {
                 title: "Connecting...",
                 body: r.createElement("span", null, r.createElement("span", null, "We're still trying to establish a websocket connection to the server. Wait a few seconds and try again."), r.createElement("br", null), r.createElement("br", null), r.createElement("span", null, "If you still can't connect, make sure your firewall isn't blocking websockets and refresh the page. If that doesn't work, try disabling any adblockers or other extensions you have that may be interfering with the connection."), r.createElement("br", null), r.createElement("br", null), r.createElement("span", null, "If all else fails, contact us to let us know.")),
                 button: "Close",
@@ -8848,7 +8878,7 @@ console.log('Running modified generals-prod.js');
                 e(a.closeRemovedFrom2v2())
             }
         }
-    })(E)
+    })(C)
 }
 , function(e, t, n) {
     "use strict";
@@ -9786,116 +9816,139 @@ console.log('Running modified generals-prod.js');
     "use strict";
     function n(e) {
         return {
-            type: c,
+            type: p,
             queue_id: e
         }
     }
     function r(e) {
         return {
-            type: l,
+            type: h,
             stars: e
         }
     }
     function o(e) {
         return {
-            type: p,
+            type: d,
             rank: e
         }
     }
     function i(e) {
         return {
-            type: h,
+            type: f,
             data: e
         }
     }
     function a(e) {
         return {
-            type: d,
+            type: m,
             team_id: e
         }
     }
     function s(e) {
         return {
-            type: f,
+            type: v,
             data: e
         }
     }
-    function u() {
+    function u(e) {
         return {
-            type: m
+            type: y,
+            data: e
         }
     }
-    var c = "MainMenu_play"
-      , l = "MainMenu_stars"
-      , p = "MainMenu_rank"
-      , h = "MainMenu_replaylist"
-      , d = "MainMenu_joinTeam"
-      , f = "MainMenu_leaderboard"
-      , m = "MainMenu_closeRemovedFrom2v2";
+    function c() {
+        return {
+            type: g
+        }
+    }
+    function l() {
+        return {
+            type: T
+        }
+    }
+    var p = "MainMenu_play"
+      , h = "MainMenu_stars"
+      , d = "MainMenu_rank"
+      , f = "MainMenu_replaylist"
+      , m = "MainMenu_joinTeam"
+      , v = "MainMenu_leaderboard"
+      , y = "MainMenu_2v2teammates"
+      , g = "MainMenu_closeRemovedFrom2v2"
+      , T = "MainMenu_notifyServerRestart";
     e.exports = {
-        ACTION_PLAY: c,
-        ACTION_STARS: l,
-        ACTION_RANK: p,
-        ACTION_REPLAYLIST: h,
-        ACTION_JOIN_TEAM: d,
-        ACTION_LEADERBOARD: f,
-        ACTION_CLOSE_REMOVED_FROM_2V2: m,
+        ACTION_PLAY: p,
+        ACTION_STARS: h,
+        ACTION_RANK: d,
+        ACTION_REPLAYLIST: f,
+        ACTION_JOIN_TEAM: m,
+        ACTION_LEADERBOARD: v,
+        ACTION_SET_2V2_TEAMMATES: y,
+        ACTION_CLOSE_REMOVED_FROM_2V2: g,
+        ACTION_NOTIFY_SERVER_RESTART: T,
         play: n,
         stars: r,
         rank: o,
         receiveReplayList: i,
         joinTeam: a,
         leaderboard: s,
-        closeRemovedFrom2v2: u
+        set2v2Teammates: u,
+        closeRemovedFrom2v2: c,
+        notifyServerRestart: l
     }
 }
 , function(e, t, n) {
     "use strict";
     function r() {
-        return B.connected
+        return L.connected
     }
     function o() {
-        B.emit("stars_and_rank", S)
+        L.emit("stars_and_rank", A)
     }
     function i(e) {
-        B.emit("play", e, S),
-        B.emit("set_username", S, e)
+        L.emit("play", e, A)
     }
     function a(e) {
-        B.emit("join_1v1", e, S)
+        L.emit("join_1v1", e, A)
     }
     function s(e, t) {
-        B.emit("join_private", e, t, S),
-        B.emit("set_username", S, t)
+        L.emit("join_private", e, t, A)
     }
     function u(e, t) {
-        B.emit("set_custom_team", e, t)
+        L.emit("set_custom_team", e, t)
     }
     function c(e, t, n, r) {
-        A.getState().game.isLocalGame ? I.handleAttack(e, t, n, r) : B.emit("attack", e, t, n, r)
+        P.getState().game.isLocalGame ? O.handleAttack(e, t, n, r) : L.emit("attack", e, t, n, r)
     }
-    function l() {
-        B.emit("cancel", A.getState().queue.queue_id)
+    function l(e) {
+        L.emit("ping_tile", e),
+        P.dispatch(M.cleanPings(e)),
+        P.dispatch(M.pingTile(e))
     }
-    function p(e) {
-        B.emit("set_force_start", A.getState().queue.queue_id, e)
+    function p() {
+        L.emit("cancel", P.getState().queue.queue_id)
     }
-    function h(e, t, n) {
-        B.emit("chat_message", e, t, n)
+    function h(e) {
+        L.emit("set_force_start", P.getState().queue.queue_id, e)
     }
-    function d(e) {
-        B.emit("leaderboard", e)
+    function d(e, t, n, r) {
+        L.emit("chat_message", e, t, n, r)
     }
-    function f() {
-        B.emit("leave_game")
+    function f(e) {
+        L.emit("leaderboard", e)
     }
     function m() {
-        A.getState().game.isLocalGame ? I.handleUndoMove() : B.emit("undo_move")
+        L.emit("get_2v2_teammates", A)
     }
     function v() {
-        A.getState().game.isLocalGame ? I.handleClearMoves() : B.emit("clear_moves")
+        L.emit("leave_game")
     }
-    function y(e, t) {
+    function y() {
+        P.getState().game.isLocalGame ? O.handleUndoMove() : L.emit("undo_move")
+    }
+    function g() {
+        P.getState().game.isLocalGame ? O.handleClearMoves() : L.emit("clear_moves")
+    }
+    function T(e, t) {
         var n = new XMLHttpRequest;
         n.open("GET", "/" + e + ".gior"),
         n.responseType = "arraybuffer",
@@ -9905,113 +9958,131 @@ console.log('Running modified generals-prod.js');
         ,
         n.send()
     }
-    function g(e) {
-        B.emit("replay_list", {
-            user_id: S,
+    function b(e) {
+        L.emit("replay_list", {
+            user_id: A,
             max_time: e
         })
     }
-    function T(e, t) {
-        B.emit("join_team", e, t, S)
+    function S(e, t) {
+        L.emit("join_team", e, t, A)
     }
-    function b(e) {
-        B.emit("leave_team", e)
+    function E(e) {
+        L.emit("leave_team", e)
     }
-    var S, E = n(212), A = n(265), C = n(210), P = n(269), _ = n(267), M = n(277), w = n(278), k = n(287), x = n(176), I = n(288), N = n(271);
-    if (k && k.user_id ? S = k.user_id : (S = w(),
-    k && (k.user_id = S)),
-    console.log("user_id: " + S),
-    k)
+    var A, C = n(212), P = n(265), _ = n(210), M = n(269), w = n(267), k = n(277), x = n(278), I = n(287), N = n(176), O = n(288), R = n(271);
+    if (I && I.user_id ? A = I.user_id : (A = x(),
+    I && (I.user_id = A)),
+    console.log("user_id: " + A),
+    I)
         try {
-            if (k.hasOwnProperty("stars")) {
-                console.log("cached stars: " + k.stars);
-                var O = JSON.parse(k.stars);
-                A.dispatch(C.stars(O))
+            if (I.hasOwnProperty("stars")) {
+                console.log("cached stars: " + I.stars);
+                var D = JSON.parse(I.stars);
+                P.dispatch(_.stars(D))
             }
-            if (k.hasOwnProperty("rank")) {
-                console.log("cached rank: " + k.rank);
-                var R = JSON.parse(k.rank);
-                A.dispatch(C.rank(R))
+            if (I.hasOwnProperty("rank")) {
+                console.log("cached rank: " + I.rank);
+                var B = JSON.parse(I.rank);
+                P.dispatch(_.rank(B))
             }
         } catch (e) {
-            A.dispatch(C.stars({})),
-            A.dispatch(C.rank({}))
+            P.dispatch(_.stars({})),
+            P.dispatch(_.rank({}))
         }
-    var D = "http://ws.generals.io";
-    "localhost" === window.location.hostname && (D = "http://localhost:8080"),
-    window.location.hostname.indexOf("ngrok") >= 0 && (D = window.location.toString()),
-    "eu." === window.location.hostname.substring(0, 3) && (D = "http://euws.generals.io");
-    var B = E(D, {
-        transports: ["websocket"]
-    })
-      , G = !1;
-    B.on("connect", function() {
-        G ? console.log("Reconnected to server.") : console.log("Connected to server."),
-        G = !0,
+    var G = window.location.hostname;
+    switch (G) {
+    case "localhost":
+        G = "//localhost:8080";
+        break;
+    case "generals.io":
+        G = "//ws.generals.io";
+        break;
+    case "eu.generals.io":
+        G = "//euws.generals.io"
+    }
+    var L = C(G)
+      , H = !1;
+    L.on("connect", function() {
+        H ? console.log("Reconnected to server.") : console.log("Connected to server."),
+        H = !0,
         o()
     }),
-    B.on("disconnect", function() {
+    L.on("disconnect", function() {
         console.log("Disconnected from server."),
-        A.getState().page !== x.PAGE_GAME || A.getState().game.isLocalGame || alert("Disconnected from server. Please refresh the page.")
+        P.getState().page !== N.PAGE_GAME || P.getState().game.isLocalGame || alert("Disconnected from server. Please refresh the page.")
     }),
-    B.on("pre_game_start", function() {
-        A.dispatch(P.prestart())
+    L.on("pre_game_start", function() {
+        P.dispatch(M.prestart())
     }),
-    B.on("game_start", function(e) {
-        A.dispatch(P.start(e))
+    L.on("game_start", function(e) {
+        P.dispatch(M.start(e))
     }),
-    B.on("game_update", function(e) {
-        A.dispatch(P.update(e))
+    L.on("game_update", function(e) {
+        P.dispatch(M.update(e))
     }),
-    B.on("queue_update", function(e) {
-        A.dispatch(_.update(e))
+    L.on("game_over", function() {
+        P.dispatch(M.end())
     }),
-    B.on("team_update", function(e) {
-        A.dispatch(_.update({
+    L.on("ping_tile", function(e) {
+        P.dispatch(M.pingTile(e))
+    }),
+    L.on("queue_update", function(e) {
+        P.dispatch(w.update(e))
+    }),
+    L.on("team_update", function(e) {
+        P.dispatch(w.update({
             numPlayers: e
         }))
     }),
-    B.on("team_joined_queue", function() {
-        N.changeURL("/"),
-        A.dispatch(C.play("2v2"))
+    L.on("team_joined_queue", function() {
+        R.changeURL("/"),
+        P.dispatch(_.play("2v2"))
     }),
-    B.on("removed_from_queue", function() {
-        A.dispatch(_.removeFrom2v2())
+    L.on("removed_from_queue", function() {
+        P.dispatch(w.removeFrom2v2())
     }),
-    B.on("chat_message", function(e, t) {
-        A.dispatch(M.receiveMessage(e, t))
+    L.on("chat_message", function(e, t) {
+        P.dispatch(k.receiveMessage(e, t))
     }),
-    B.on("game_lost", function(e) {
-        A.dispatch(P.lose(e))
+    L.on("game_lost", function(e) {
+        P.dispatch(M.lose(e))
     }),
-    B.on("game_won", function(e) {
-        A.dispatch(P.win(e))
+    L.on("game_won", function(e) {
+        P.dispatch(M.win(e))
     }),
-    B.on("replay_list", function(e) {
-        A.dispatch(C.receiveReplayList(e))
+    L.on("replay_list", function(e) {
+        P.dispatch(_.receiveReplayList(e))
     }),
-    B.on("server_down", function() {
+    L.on("server_down", function() {
         window.location.reload(!1)
     }),
-    B.on("leaderboard", function(e) {
-        k && (k["leaderboard:" + e.ladder] = JSON.stringify(e)),
-        A.dispatch(C.leaderboard(e))
+    L.on("leaderboard", function(e) {
+        I && (I["leaderboard:" + e.ladder] = JSON.stringify(e)),
+        P.dispatch(_.leaderboard(e))
     }),
-    B.on("stars", function(e) {
+    L.on("2v2_teammates", function(e) {
+        I && (I["2v2_teammates"] = JSON.stringify(e)),
+        P.dispatch(_.set2v2Teammates(e))
+    }),
+    L.on("stars", function(e) {
         console.log("stars: " + JSON.stringify(e)),
-        A.dispatch(C.stars(e))
+        P.dispatch(_.stars(e))
     }),
-    B.on("rank", function(e) {
+    L.on("rank", function(e) {
         console.log("rank: " + JSON.stringify(e)),
-        A.dispatch(C.rank(e))
+        P.dispatch(_.rank(e))
     }),
-    B.on("error_user_id", function() {
-        A.dispatch(_.cancel()),
+    L.on("error_user_id", function() {
+        P.dispatch(w.cancel()),
         alert("You are already using this account! Make sure you don't have multiple tabs with generals.io open.\n\nIf you believe you are seeing this message in error, please email us at generalsiogame@gmail.com.")
     }),
-    B.on("error_queue_full", function() {
-        A.dispatch(_.cancel()),
+    L.on("error_queue_full", function() {
+        P.dispatch(w.cancel()),
         alert("This game is already full.")
+    }),
+    L.on("server_restart", function() {
+        P.dispatch(_.notifyServerRestart())
     }),
     e.exports = {
         isConnected: r,
@@ -10021,17 +10092,19 @@ console.log('Running modified generals-prod.js');
         playPrivate: s,
         setCustomTeam: u,
         attack: c,
-        cancel: l,
-        setForceStart: p,
-        sendChatMessage: h,
-        getLeaderboard: d,
-        leaveGame: f,
-        undoMove: m,
-        clearMoves: v,
-        getReplay: y,
-        getReplayList: g,
-        joinTeam: T,
-        leaveTeam: b
+        pingTile: l,
+        cancel: p,
+        setForceStart: h,
+        sendChatMessage: d,
+        getLeaderboard: f,
+        get2v2Teammates: m,
+        leaveGame: v,
+        undoMove: y,
+        clearMoves: g,
+        getReplay: T,
+        getReplayList: b,
+        joinTeam: S,
+        leaveTeam: E
     }
 }
 , function(e, t, n) {
@@ -10108,7 +10181,7 @@ console.log('Running modified generals-prod.js');
         s
     }
 }
-, [324, 216], [325, 217], function(e, t) {
+, [326, 216], [327, 217], function(e, t) {
     function n(e) {
         if (e = String(e),
         !(e.length > 1e4)) {
@@ -13100,7 +13173,7 @@ console.log('Running modified generals-prod.js');
     o.decode = r,
     e.exports = o
 }
-, [324, 251], [325, 252], 217, function(e, t, n) {
+, [326, 251], [327, 252], 217, function(e, t, n) {
     (function(t) {
         function r() {}
         function o(e) {
@@ -13736,6 +13809,10 @@ console.log('Running modified generals-prod.js');
             return Object.assign({}, e, {
                 leaderboard: Object.assign({}, u, r({}, t.data.ladder, t.data))
             });
+        case i.ACTION_SET_2V2_TEAMMATES:
+            return Object.assign({}, e, {
+                data2v2Teammates: t.data
+            });
         case a.ACTION_REMOVE_FROM_2V2:
             return Object.assign({}, e, {
                 showRemovedFrom2v2: !0
@@ -13743,6 +13820,10 @@ console.log('Running modified generals-prod.js');
         case i.ACTION_CLOSE_REMOVED_FROM_2V2:
             return Object.assign({}, e, {
                 showRemovedFrom2v2: !1
+            });
+        case i.ACTION_NOTIFY_SERVER_RESTART:
+            return Object.assign({}, e, {
+                showNotifyServerRestart: !0
             })
         }
         return e
@@ -13793,6 +13874,7 @@ console.log('Running modified generals-prod.js');
         case i.ACTION_CANCEL:
         case i.ACTION_REMOVE_FROM_2V2:
         case a.ACTION_EXIT:
+        case o.ACTION_NOTIFY_SERVER_RESTART:
             return u.changeURL("/"),
             s.PAGE_MAIN_MENU;
         case a.ACTION_INVALID_REPLAY:
@@ -13810,14 +13892,14 @@ console.log('Running modified generals-prod.js');
 , function(e, t, n) {
     "use strict";
     function r(e) {
-        return e || d.playSound("gong.mp3"),
+        return e || v.playSound("gong.mp3"),
         {
-            type: f
+            type: y
         }
     }
     function o(e, t, n, r) {
         return Object.assign({
-            type: m,
+            type: g,
             isLocalGame: t,
             isTutorial: n,
             isReplay: r
@@ -13825,70 +13907,93 @@ console.log('Running modified generals-prod.js');
     }
     function i(e) {
         return Object.assign({
-            type: v
+            type: T
         }, e)
     }
     function a(e) {
         return {
-            type: y,
+            type: b,
             data: e
         }
     }
     function s(e) {
         return {
-            type: g,
+            type: S,
             data: e
         }
     }
     function u() {
         return {
-            type: T
+            type: E
         }
     }
     function c(e) {
         return {
-            type: b,
+            type: A,
             state: e
         }
     }
     function l() {
         return {
-            type: S
+            type: C
         }
     }
     function p() {
         return {
-            type: E
+            type: P
         }
     }
     function h(e) {
         return {
-            type: A,
+            type: _,
             speed: e
         }
     }
-    var d = n(270)
-      , f = "Game_prestart"
-      , m = "Game_start"
-      , v = "Game_update"
-      , y = "Game_lose"
-      , g = "Game_win"
-      , T = "Game_exit"
-      , b = "Game_update_tutorialState"
-      , S = "Game_toggle_autoPlay"
-      , E = "Game_invalid_replay"
-      , A = "Game_set_autoPlay_speed";
+    function d(e) {
+        return v.playSound("ping.mp3"),
+        {
+            type: M,
+            index: e
+        }
+    }
+    function f() {
+        return {
+            type: w
+        }
+    }
+    function m() {
+        return {
+            type: k
+        }
+    }
+    var v = n(270)
+      , y = "Game_prestart"
+      , g = "Game_start"
+      , T = "Game_update"
+      , b = "Game_lose"
+      , S = "Game_win"
+      , E = "Game_exit"
+      , A = "Game_update_tutorialState"
+      , C = "Game_toggle_autoPlay"
+      , P = "Game_invalid_replay"
+      , _ = "Game_set_autoPlay_speed"
+      , M = "Game_ping"
+      , w = "Game_clean_pings"
+      , k = "Game_end";
     e.exports = {
-        ACTION_PRESTART: f,
-        ACTION_START: m,
-        ACTION_UPDATE: v,
-        ACTION_LOSE: y,
-        ACTION_WIN: g,
-        ACTION_EXIT: T,
-        ACTION_UPDATE_TUTORIAL_STATE: b,
-        ACTION_TOGGLE_AUTOPLAY: S,
-        ACTION_INVALID_REPLAY: E,
-        ACTION_SET_AUTOPLAY_SPEED: A,
+        ACTION_PRESTART: y,
+        ACTION_START: g,
+        ACTION_UPDATE: T,
+        ACTION_LOSE: b,
+        ACTION_WIN: S,
+        ACTION_EXIT: E,
+        ACTION_UPDATE_TUTORIAL_STATE: A,
+        ACTION_TOGGLE_AUTOPLAY: C,
+        ACTION_INVALID_REPLAY: P,
+        ACTION_SET_AUTOPLAY_SPEED: _,
+        ACTION_PING_TILE: M,
+        ACTION_CLEAN_PINGS: w,
+        ACTION_END: k,
         prestart: r,
         start: o,
         update: i,
@@ -13898,16 +14003,22 @@ console.log('Running modified generals-prod.js');
         updateTutorialState: c,
         toggleAutoPlay: l,
         invalidReplay: p,
-        setAutoPlaySpeed: h
+        setAutoPlaySpeed: h,
+        pingTile: d,
+        cleanPings: f,
+        end: m
     }
 }
 , function(e, t) {
     "use strict";
     function n(e) {
-        r[e] && r[e].play()
+        r[e] && (r[e].currentTime = 0,
+        r[e].play())
     }
     var r = {};
-    "undefined" != typeof Audio && (r["gong.mp3"] = new Audio("/gong.mp3")),
+    "undefined" != typeof Audio && (r["gong.mp3"] = new Audio("/gong.mp3"),
+    r["ping.mp3"] = new Audio("/ping.mp3"),
+    r["ping.mp3"].volume = .5),
     e.exports = {
         playSound: n
     }
@@ -13938,15 +14049,20 @@ console.log('Running modified generals-prod.js');
             });
         case o.ACTION_START:
             return delete t.type,
-            Object.assign(Object.assign({}, e, t), {
+            Object.assign({}, e, Object.assign({
                 lost: void 0,
                 won: void 0,
+                ended: void 0,
                 generals: void 0,
+                cities: void 0,
+                teams: void 0,
                 tutorialState: s.STATE_WELCOME,
                 autoPlay: !1,
                 autoPlaySpeed: 1,
-                last_map: void 0
-            });
+                last_map: void 0,
+                chat_room: void 0,
+                team_chat_room: void 0
+            }, t));
         case o.ACTION_UPDATE:
             var n;
             return t.map_diff && (t.map = a.patch(e.last_map, t.map_diff),
@@ -13981,6 +14097,31 @@ console.log('Running modified generals-prod.js');
         case o.ACTION_SET_AUTOPLAY_SPEED:
             return Object.assign({}, e, {
                 autoPlaySpeed: t.speed
+            });
+        case o.ACTION_PING_TILE:
+            var r = e.pings ? e.pings.slice() : [];
+            return r.push({
+                timestamp: Date.now(),
+                tileIndex: t.index
+            }),
+            Object.assign({}, e, {
+                pings: r
+            });
+        case o.ACTION_CLEAN_PINGS:
+            if (e.pings && e.pings.length) {
+                var r = e.pings.slice();
+                if (r = r.filter(function(e) {
+                    return Date.now() - e.timestamp <= c.PING_DURATION
+                }),
+                r.length < e.pings.length)
+                    return Object.assign({}, e, {
+                        pings: r
+                    })
+            }
+            return e;
+        case o.ACTION_END:
+            return Object.assign({}, e, {
+                ended: !0
             })
         }
         return e
@@ -13989,7 +14130,8 @@ console.log('Running modified generals-prod.js');
       , i = n(210)
       , a = n(273)
       , s = n(274)
-      , u = n(177);
+      , u = n(177)
+      , c = n(1);
     e.exports = r
 }
 , function(e, t) {
@@ -14222,6 +14364,7 @@ console.log('Running modified generals-prod.js');
             n;
         case i.ACTION_JOIN_TEAM:
             return Object.assign({}, e, {
+                prestart: !1,
                 isTeamQueue: !0,
                 team_id: t.team_id,
                 queue_id: void 0
@@ -14244,15 +14387,19 @@ console.log('Running modified generals-prod.js');
         switch (e = e || {},
         t.type) {
         case o.ACTION_MESSAGE:
-            var n;
-            n = e[t.chat_room] ? e[t.chat_room] : [];
-            var r = {};
-            return r[t.chat_room] = n.concat(t.data),
-            Object.assign({}, e, r)
+            var n = t.chat_room
+              , r = i.originalFromTeamChatRoom(n);
+            r && (n = r);
+            var a;
+            a = e[n] ? e[n] : [];
+            var s = {};
+            return s[n] = a.concat(t.data),
+            Object.assign({}, e, s)
         }
         return e
     }
-    var o = n(277);
+    var o = n(277)
+      , i = n(177);
     e.exports = r
 }
 , function(e, t) {
@@ -14612,17 +14759,18 @@ console.log('Running modified generals-prod.js');
             this.chat_room = "game_" + this.startTime + e[0].id,
             this.attackIndices = [],
             this.deaths = [];
-            for (var u = 0; u < e.length; u++)
+            for (var l = 0; l < e.length; l++)
                 this.inputBuffer.push([]),
                 this.scores.push({
                     total: 1,
                     tiles: 1
                 }),
-                c || e[u].join(this.chat_room),
+                c || (e[l].join(this.chat_room),
+                u.hasDuplicate(this.teams) && e[l].join(u.chatRoomForTeam(this, this.teams[l]))),
                 this.attackIndices.push(0);
             if (!o) {
-                for (var l = !1; !l || !this.validateGame(); )
-                    l = this.tryInitializeGame(e);
+                for (var p = !1; !p || !this.validateGame(); )
+                    p = this.tryInitializeGame(e);
                 this.replay = new a(this)
             }
         }
@@ -14694,68 +14842,67 @@ console.log('Running modified generals-prod.js');
         var l = this.map.size();
         if (this.generals = [],
         this.teams && u.hasDuplicate(this.teams)) {
-            for (var p, h = 0, d = s.MIN_ALLY_SPACING, f = s.MAX_ALLY_SPACING, m = 0; m < this.teams.length; m++) {
-                var v = this.teams[m];
-                if (this.teams.filter(function(e) {
-                    return e === v
-                }).length >= s.ALLY_LOOSE_THRESHOLD) {
-                    d = s.MIN_ALLY_SPACING_LOOSE,
-                    f = s.MAX_ALLY_SPACING_LOOSE;
-                    break
-                }
-            }
-            for (; ; ) {
+            for (var p, h = 0; ; ) {
                 h++,
                 p = [];
-                for (var m = 0; m < e.length; m++)
+                for (var d = 0; d < e.length; d++)
                     p.push(Math.floor(Math.random() * l));
-                for (var y = !1, m = 0; m < p.length; m++) {
-                    for (var g = 0; g < m; g++)
-                        if (this.teams[m] === this.teams[g]) {
-                            var T = this.map.distance(p[m], p[g]);
-                            if (T > f || T < d) {
-                                y = !0;
+                for (var f = !1, m = p.map(function() {
+                    return 1 / 0
+                }), d = 0; d < p.length; d++) {
+                    for (var v = 0; v < d; v++)
+                        if (this.teams[d] === this.teams[v]) {
+                            var y = this.map.distance(p[d], p[v]);
+                            if (y < s.MIN_ALLY_SPACING) {
+                                f = !0;
                                 break
                             }
+                            m[d] = Math.min(y, m[d]),
+                            m[v] = Math.min(y, m[v])
                         }
-                    if (y)
+                    if (f)
                         break
                 }
-                if (!y)
+                for (var d = 0; d < m.length; d++)
+                    if (m[d] < 1 / 0 && m[d] > s.MAX_ALLY_SPACING) {
+                        f = !0;
+                        break
+                    }
+                if (!f)
                     break
             }
-            for (var m = 0; m < e.length; m++)
-                this.addGeneral(p[m])
+            for (var d = 0; d < e.length; d++)
+                this.addGeneral(p[d])
         } else
-            for (var m = 0; m < e.length; m++) {
-                for (var b, S = !1, h = 0; !S; ) {
+            for (var d = 0; d < e.length; d++) {
+                for (var g, T = !1, h = 0; !T; ) {
                     if (h++,
                     h > 5e3)
                         return !1;
-                    b = Math.floor(Math.random() * l),
-                    S = !0;
-                    for (var g = 0; g < this.generals.length; g++)
-                        if (this.map.distance(this.generals[g], b) <= c) {
-                            S = !1;
+                    g = Math.floor(Math.random() * l),
+                    T = !0;
+                    for (var v = 0; v < this.generals.length; v++)
+                        if (this.map.distance(this.generals[v], g) <= c) {
+                            T = !1;
                             break
                         }
                 }
-                this.addGeneral(b)
+                this.addGeneral(g)
             }
         this.cities = [];
-        for (var m = 0; m < a; m++) {
-            var E = Math.floor(Math.random() * l);
-            if (this.hasCityOrGeneral(E))
-                m--;
+        for (var d = 0; d < a; d++) {
+            var b = Math.floor(Math.random() * l);
+            if (this.hasCityOrGeneral(b))
+                d--;
             else {
-                var A = s.MIN_CITY_ARMY
-                  , C = s.MAX_CITY_ARMY;
-                this.addCity(E, Math.round(A + Math.random() * (C - A)))
+                var S = s.MIN_CITY_ARMY
+                  , E = s.MAX_CITY_ARMY;
+                this.addCity(b, Math.round(S + Math.random() * (E - S)))
             }
         }
-        for (var P = l * (.2 + .08 * Math.random()), m = 0; m < P; m++) {
-            var E = Math.floor(Math.random() * l);
-            this.hasCityOrGeneral(E) ? m-- : this.addMountain(E)
+        for (var A = l * (.2 + .08 * Math.random()), d = 0; d < A; d++) {
+            var b = Math.floor(Math.random() * l);
+            this.hasCityOrGeneral(b) ? d-- : this.addMountain(b)
         }
         return !0
     }
@@ -14846,14 +14993,21 @@ console.log('Running modified generals-prod.js');
                 playerIndex: r,
                 replay_id: t.replay.id,
                 chat_room: t.chat_room,
+                team_chat_room: u.hasDuplicate(t.teams) ? u.chatRoomForTeam(t, t.teams[r]) : void 0,
                 usernames: n,
                 teams: t.teams
             })
         }),
         setTimeout(function() {
             return t.update() ? void e() : void (t.setIntervalReturn = setInterval(function() {
-                t.update() && (clearInterval(t.setIntervalReturn),
-                e())
+                if (t.update()) {
+                    clearInterval(t.setIntervalReturn),
+                    e();
+                    for (var n = t.sockets.filter(function(e) {
+                        return t.leftSockets.indexOf(e) < 0
+                    }), r = 0; r < n.length; r++)
+                        n[r].emit("game_over")
+                }
             }, 500))
         }, 0)
     }
@@ -14863,12 +15017,12 @@ console.log('Running modified generals-prod.js');
             if (this.options.old_priority)
                 if (this.options.priority_cycle)
                     var n = (t + this.turn) % this.sockets.length;
+                else if (this.options.priority_reversed)
+                    var n = this.sockets.length - 1 - t;
                 else
                     var n = t;
-            else if (this.turns % 2 === 0)
-                var n = t;
             else
-                var n = this.sockets.length - 1 - t;
+                var n = this.turn % 2 === 0 ? t : this.sockets.length - 1 - t;
             for (; this.inputBuffer[n].length; ) {
                 var r = this.inputBuffer[n].splice(0, 1)[0];
                 if (this.handleAttack(n, r[0], r[1], r[2], r[3]) !== !1) {
@@ -14935,15 +15089,17 @@ console.log('Running modified generals-prod.js');
                             return;
                 if (void 0 !== e) {
                     var n = this;
-                    return this.sockets.filter(function(t, r) {
+                    return this.winners = this.sockets.filter(function(t, r) {
                         return n.teams[r] === e
-                    })
+                    }),
+                    this.winners
                 }
             }
         } else
             for (var t = 0; t < this.generals.length; t++)
                 if (this.deaths.indexOf(this.sockets[t]) < 0)
-                    return [this.sockets[t]]
+                    return this.winners = [this.sockets[t]],
+                    this.winners
     }
     ,
     r.prototype.sendGameUpdate = function(e, t, n, o) {
@@ -15025,6 +15181,22 @@ console.log('Running modified generals-prod.js');
             this.generals[s] = l,
             c || io.to(this.chat_room).emit("chat_message", this.chat_room, {
                 text: this.sockets[a].gio_username + " captured " + this.sockets[s].gio_username + "."
+            })
+        }
+    }
+    ,
+    r.prototype.handlePingTile = function(e, t) {
+        if (this.teams) {
+            var n = this.indexOfSocketID(e);
+            if (n < 0)
+                return void console.error("Ping for socket_id not in game: " + e);
+            var r = this.leftSockets
+              , o = this.teams
+              , i = this.sockets.filter(function(e, t) {
+                return r.indexOf(e) < 0 && n !== t && o[n] === o[t]
+            });
+            i.forEach(function(e) {
+                e.emit("ping_tile", t)
             })
         }
     }
@@ -15152,7 +15324,7 @@ console.log('Running modified generals-prod.js');
         var u = n(273)
           , c = n(295)
           , l = n(278)
-          , p = 4
+          , p = 5
           , h = {
             REPLAY_VERSION_1: {
                 old_priority: !0
@@ -15167,7 +15339,11 @@ console.log('Running modified generals-prod.js');
                 old_priority: !0,
                 priority_cycle: !0
             },
-            REPLAY_VERSION_5: {}
+            REPLAY_VERSION_5: {
+                old_priority: !0,
+                priority_reversed: !0
+            },
+            REPLAY_VERSION_6: {}
         };
         r.prototype.addMove = function(e, t, n, r, o) {
             this.moves.push({
@@ -15503,7 +15679,7 @@ console.log('Running modified generals-prod.js');
             return z(K(t, e.length - n), e, n, r)
         }
         function C(e, t, n, r) {
-            return z(X(t), e, n, r)
+            return z(q(t), e, n, r)
         }
         function P(e, t, n, r) {
             return C(e, t, n, r)
@@ -15512,7 +15688,7 @@ console.log('Running modified generals-prod.js');
             return z(Y(t), e, n, r)
         }
         function M(e, t, n, r) {
-            return z(q(t, e.length - n), e, n, r)
+            return z(X(t, e.length - n), e, n, r)
         }
         function w(e, t, n) {
             return 0 === t && n === e.length ? J.fromByteArray(e) : J.fromByteArray(e.slice(t, n))
@@ -15694,12 +15870,12 @@ console.log('Running modified generals-prod.js');
             }
             return i
         }
-        function X(e) {
+        function q(e) {
             for (var t = [], n = 0; n < e.length; ++n)
                 t.push(255 & e.charCodeAt(n));
             return t
         }
-        function q(e, t) {
+        function X(e, t) {
             for (var n, r, o, i = [], a = 0; a < e.length && !((t -= 2) < 0); ++a)
                 n = e.charCodeAt(a),
                 r = n >> 8,
@@ -16851,6 +17027,7 @@ console.log('Running modified generals-prod.js');
         },
         render: function() {
             return r.createElement("button", {
+                id: this.props.id,
                 className: "small",
                 onClick: this.onClick,
                 style: {
@@ -16874,6 +17051,24 @@ console.log('Running modified generals-prod.js');
                     verticalAlign: "top"
                 }
             }, "/r/generalsio"))
+        }
+    });
+    e.exports = o
+}
+, function(e, t, n) {
+    "use strict";
+    var r = n(3)
+      , o = r.createClass({
+        displayName: "DiscordButton",
+        onClick: function() {
+            window.open("https://discord.gg/a97CQZb")
+        },
+        render: function() {
+            return r.createElement("div", {
+                id: this.props.id,
+                className: "discord-button",
+                onClick: this.onClick
+            })
         }
     });
     e.exports = o
@@ -16920,7 +17115,7 @@ console.log('Running modified generals-prod.js');
         i = !0
     }
     var i = !1;
-    n(302);
+    n(303);
     "undefined" == typeof fuckAdBlock ? o() : (fuckAdBlock.onDetected(o),
     fuckAdBlock.onNotDetected(r)),
     e.exports = {
@@ -17090,7 +17285,7 @@ console.log('Running modified generals-prod.js');
 }
 , function(e, t, n) {
     "use strict";
-    var r = n(304)
+    var r = n(305)
       , o = new r(window.navigator.userAgent);
     e.exports = o.mobile()
 }
@@ -17537,7 +17732,7 @@ console.log('Running modified generals-prod.js');
         return "undefined" != typeof e && e.exports ? function(t) {
             e.exports = t()
         }
-        : n(305)
+        : n(306)
     }())
 }
 , function(e, t) {
@@ -17568,20 +17763,24 @@ console.log('Running modified generals-prod.js');
             }, this.props.body), this.props.button2 ? r.createElement("button", {
                 className: "small inverted",
                 onClick: this.props.onClick2
-            }, this.props.button2) : null, r.createElement("br", null), r.createElement("button", {
+            }, this.props.button2) : null, r.createElement("br", null), this.props.button ? r.createElement("button", {
                 className: "inverted",
                 onClick: this.props.onClick
-            }, this.props.button)))
+            }, this.props.button) : null))
         }
     });
     e.exports = o
 }
 , function(e, t, n) {
     "use strict";
-    var r = n(3)
-      , o = n(308)
-      , i = n(297)
-      , a = r.createClass({
+    function r(e, t) {
+        return (e || "Anonymous") === (t || "Anonymous")
+    }
+    var o = n(3)
+      , i = n(309)
+      , a = n(297)
+      , s = "2v2-teammates"
+      , u = o.createClass({
         displayName: "Leaderboards",
         getInitialState: function() {
             return {
@@ -17600,56 +17799,104 @@ console.log('Running modified generals-prod.js');
             }),
             this.props.getLeaderboard("ffa")
         },
+        show2v2Leaderboard: function() {
+            this.setState({
+                ladder: "2v2"
+            }),
+            this.props.getLeaderboard("2v2")
+        },
+        show2v2TeammatesLeaderboard: function() {
+            this.setState({
+                ladder: s
+            }),
+            this.props.get2v2Teammates()
+        },
         leaderboardRows: function(e) {
             var t = this
               , n = this.props.allLeaderboards
-              , o = n ? n[e] : null;
-            if (!o && localStorage) {
-                var i = localStorage["leaderboard:" + e];
-                if (i)
+              , i = n ? n[e] : null;
+            if (!i && localStorage) {
+                var a = localStorage["leaderboard:" + e];
+                if (a)
                     try {
-                        o = JSON.parse(i)
+                        i = JSON.parse(a)
                     } catch (e) {}
             }
-            if (!o)
+            if (!i)
                 return null;
-            var a = o.users
-              , s = o.stars;
-            return (s || []).map(function(n, o) {
-                var i = t.props.playerRanks && t.props.playerRanks[e] === o + 1 && t.props.playerUsername === a[o];
-                return r.createElement("tr", {
-                    key: "leaderboard-row-" + o,
-                    className: i ? "highlighted" : ""
-                }, r.createElement("td", null, o + 1), r.createElement("td", null, a[o] || "Anonymous"), r.createElement("td", null, Math.max(0, Math.round(n || 0))))
+            var s = i.users
+              , u = i.stars
+              , c = 0
+              , l = this.props.playerUsername
+              , p = "2v2" === e;
+            return (u || []).map(function(n, i) {
+                var a = t.props.playerRanks && t.props.playerRanks[e] === i + 1
+                  , u = p ? r(l, s[2 * i]) || r(l, s[2 * i + 1]) : r(l, s[i])
+                  , h = a && u;
+                return o.createElement("tr", {
+                    key: "leaderboard-row-" + i,
+                    className: h ? "highlighted" : ""
+                }, o.createElement("td", null, i + 1), o.createElement("td", null, s[c++] || "Anonymous"), p ? o.createElement("td", null, s[c++] || "Anonymous") : null, o.createElement("td", null, Math.max(0, Math.round(n || 0))))
             })
         },
+        leaderboard2v2TeammateRows: function() {
+            var e = this.props.data2v2Teammates;
+            if (!e && localStorage) {
+                var t = localStorage["2v2_teammates"];
+                if (t)
+                    try {
+                        e = JSON.parse(t)
+                    } catch (e) {}
+            }
+            return e ? e.map(function(e, t) {
+                return o.createElement("tr", {
+                    key: "leaderboard-row-" + t
+                }, o.createElement("td", null, t + 1), o.createElement("td", null, e.username || "Anonymous"), o.createElement("td", null, Math.max(0, Math.round(e.stars || 0))), o.createElement("td", null, e.rank))
+            }) : null
+        },
         render: function() {
-            return r.createElement("div", {
+            var e = 0;
+            switch (this.state.ladder) {
+            case "ffa":
+                e = 1;
+                break;
+            case "2v2":
+                e = 2;
+                break;
+            case s:
+                e = 3
+            }
+            return o.createElement("div", {
                 className: "popup-background"
-            }, r.createElement("div", {
+            }, o.createElement("div", {
                 id: "leaderboard",
                 className: "alert center"
-            }, r.createElement("h1", {
+            }, o.createElement("h1", {
                 className: "center-horizontal",
                 style: {
                     textShadow: "1px 1px black"
                 }
-            }, "Leaderboards"), r.createElement("div", {
+            }, "Leaderboards"), o.createElement("div", {
                 id: "leaderboard-table-container"
-            }, r.createElement(o, {
+            }, o.createElement(i, {
                 tab_id: "main-menu-leaderboard",
-                selectedTab: "duel" === this.state.ladder ? 0 : 1,
-                onClicks: [this.show1v1Leaderboard, this.showFFALeaderboard],
-                titles: ["1v1", "FFA"]
-            }), r.createElement("table", {
+                selectedTab: e,
+                onClicks: [this.show1v1Leaderboard, this.showFFALeaderboard, this.show2v2Leaderboard, this.show2v2TeammatesLeaderboard],
+                titles: ["1v1", "FFA", "2v2", "2v2 Partners"]
+            }), this.state.ladder === s ? o.createElement("p", {
+                style: {
+                    color: "black",
+                    margin: "5px"
+                }
+            }, "This leaderboard lists the partners you've played ranked 2v2 with.") : null, o.createElement("table", {
                 id: "leaderboard-table"
-            }, r.createElement("tbody", null, r.createElement("tr", null, r.createElement("th", null, "#"), r.createElement("th", null, "Username"), r.createElement("th", null, " ", r.createElement(i, null), " ")), this.leaderboardRows(this.state.ladder)))), r.createElement("button", {
+            }, o.createElement("tbody", null, this.state.ladder === s ? o.createElement("tr", null, o.createElement("th", null, "#"), o.createElement("th", null, "Teammate"), o.createElement("th", null, " ", o.createElement(a, null), " "), o.createElement("th", null, "Rank")) : o.createElement("tr", null, o.createElement("th", null, "#"), o.createElement("th", null, "Username"), "2v2" === this.state.ladder ? o.createElement("th", null, "Username") : null, o.createElement("th", null, " ", o.createElement(a, null), " ")), this.state.ladder === s ? this.leaderboard2v2TeammateRows() : this.leaderboardRows(this.state.ladder)))), o.createElement("button", {
                 className: "small inverted center-horizontal",
                 onClick: this.props.hideLeaderboards
             }, "Exit")))
         }
     });
-    e.exports = a
+    e.exports = u
 }
 , function(e, t, n) {
     "use strict";
@@ -17677,20 +17924,68 @@ console.log('Running modified generals-prod.js');
 , function(e, t, n) {
     "use strict";
     var r = n(3)
+      , o = r.createClass({
+        displayName: "Ad",
+        componentDidMount: function() {
+            var e = this.props.id;
+            googletag.cmd.push(function() {
+                googletag.display(e)
+            })
+        },
+        render: function() {
+            var e = Object.assign({}, this.props.style, {
+                width: this.props.width + "px",
+                height: this.props.height + "px"
+            });
+            return r.createElement("div", {
+                className: "relative",
+                style: e
+            }, r.createElement("div", {
+                className: "absolute-fill",
+                style: {
+                    backgroundColor: "#333"
+                }
+            }, r.createElement("div", {
+                className: "center",
+                style: {
+                    textAlign: "center",
+                    minWidth: "90%"
+                }
+            }, r.createElement("p", {
+                className: "bold",
+                style: {
+                    whiteSpace: "nowrap",
+                    margin: "1px",
+                    fontSize: "14px"
+                }
+            }, "Advertisement"), r.createElement("p", {
+                style: {
+                    margin: "1px",
+                    fontSize: "11px"
+                }
+            }, "Ads help keep updates coming and generals.io servers running!"))), r.createElement("div", {
+                id: this.props.id,
+                className: "absolute-fill"
+            }))
+        }
+    });
+    e.exports = o
+}
+, function(e, t, n) {
+    "use strict";
+    var r = n(3)
       , o = n(179)
       , i = n(267)
       , a = n(211)
       , s = n(1)
       , u = n(271)
-      , c = n(310)
-      , l = n(311)
-      , p = r.createClass({
+      , c = n(312)
+      , l = n(313)
+      , p = n(310)
+      , h = r.createClass({
         displayName: "Queue",
         componentDidMount: function() {
-            this.props.isTeamQueue && u.changeURL("/teams/" + encodeURIComponent(this.props.team_id)),
-            googletag.cmd.push(function() {
-                googletag.display("div-gpt-ad-1479698638527-1")
-            })
+            this.props.isTeamQueue && u.changeURL("/teams/" + encodeURIComponent(this.props.team_id))
         },
         render: function() {
             var e = Math.floor(this.props.queueTimeLeft / 60)
@@ -17723,11 +18018,11 @@ console.log('Running modified generals-prod.js');
             }, "We'll play a gong sound when the game starts. Turn your volume up!")), this.props.prestart || n || this.props.isTeamQueue || o || !(this.props.numPlayers > 1) ? null : r.createElement(c, null), r.createElement("br", null), this.props.prestart ? null : r.createElement("button", {
                 className: "small",
                 onClick: this.props.onCancelClicked.bind(this)
-            }, "Cancel"), r.createElement("div", {
-                id: "div-gpt-ad-1479698638527-1",
+            }, "Cancel"), r.createElement(p, {
+                id: "div-gpt-ad-1484365524244-1",
+                width: 336,
+                height: 280,
                 style: {
-                    height: "280px",
-                    width: "336px",
                     marginTop: "10px"
                 }
             })))
@@ -17742,7 +18037,7 @@ console.log('Running modified generals-prod.js');
                 e(i.cancel())
             }
         }
-    })(p)
+    })(h)
 }
 , function(e, t, n) {
     "use strict";
@@ -17788,7 +18083,7 @@ console.log('Running modified generals-prod.js');
 }
 , function(e, t, n) {
     "use strict";
-    for (var r = n(3), o = n(179), i = n(267), a = n(310), s = n(211), u = n(1), c = n(177), l = n(271), p = n(313), h = n(315), d = n(308), f = n(311), m = [], v = 0; v < u.PLAYER_CAP; v++)
+    for (var r = n(3), o = n(179), i = n(267), a = n(312), s = n(211), u = n(1), c = n(177), l = n(271), p = n(315), h = n(317), d = n(309), f = n(313), m = [], v = 0; v < u.PLAYER_CAP; v++)
         m.push(v + 1);
     var y = r.createClass({
         displayName: "CustomQueue",
@@ -17897,9 +18192,10 @@ console.log('Running modified generals-prod.js');
 , function(e, t, n) {
     "use strict";
     var r = n(3)
-      , o = n(314)
+      , o = n(316)
       , i = n(211)
-      , a = r.createClass({
+      , a = "[team] "
+      , s = r.createClass({
         displayName: "ChatRoom",
         getInitialState: function() {
             return {
@@ -17907,7 +18203,9 @@ console.log('Running modified generals-prod.js');
             }
         },
         handleMessageChange: function(e) {
-            this.setState({
+            this.props.useTeamChat ? this.setState({
+                currentMessage: e.target.value.substring(a.length)
+            }) : this.setState({
                 currentMessage: e.target.value
             })
         },
@@ -17917,10 +18215,26 @@ console.log('Running modified generals-prod.js');
         handleKeyPress: function(e) {
             e.stopPropagation();
             var t = e.which || e.keyCode;
-            13 === t && (this.state.currentMessage ? (i.sendChatMessage(this.props.chat_room, this.state.currentMessage, this.props.playerIndex),
+            if (13 === t)
+                if (this.state.currentMessage) {
+                    var n = this.props.team_chat_room
+                      , r = this.props.chat_room;
+                    i.sendChatMessage(this.props.useTeamChat ? n || r : r, this.state.currentMessage, this.props.playerIndex, this.props.useTeamChat && n ? a : ""),
+                    this.setState({
+                        currentMessage: ""
+                    })
+                } else
+                    this.refs.input.blur()
+        },
+        handleFocus: function() {
             this.setState({
-                currentMessage: ""
-            })) : this.refs.input.blur())
+                focused: !0
+            })
+        },
+        handleBlur: function() {
+            this.setState({
+                focused: !1
+            })
         },
         componentWillUpdate: function() {
             var e = this.refs.list;
@@ -17955,21 +18269,23 @@ console.log('Running modified generals-prod.js');
                 id: "chatroom-input",
                 type: "text",
                 ref: "input",
-                placeholder: "Press [Enter] to send a message",
-                value: this.state.currentMessage,
+                placeholder: this.props.team_chat_room ? "[Enter] to chat, [t] to teamchat" : "Press [Enter] to chat.",
+                value: (this.state.focused && this.props.useTeamChat ? a : "") + this.state.currentMessage,
                 onChange: this.handleMessageChange,
                 onKeyPress: this.handleKeyPress,
-                onKeyDown: this.handleKeyDown
+                onKeyDown: this.handleKeyDown,
+                onFocus: this.handleFocus,
+                onBlur: this.handleBlur
             }))
         }
     });
-    e.exports = a
+    e.exports = s
 }
 , function(e, t, n) {
     "use strict";
     var r = n(3)
       , o = n(1)
-      , i = n(311)
+      , i = n(313)
       , a = r.createClass({
         displayName: "ChatMessage",
         render: function() {
@@ -17977,7 +18293,9 @@ console.log('Running modified generals-prod.js');
               , t = e.hasOwnProperty("playerIndex") ? o.PLAYER_COLORS[e.playerIndex] : null;
             return e.hasOwnProperty("username") ? r.createElement("p", {
                 className: "chat-message"
-            }, t ? r.createElement(i, {
+            }, e.prefix ? r.createElement("span", {
+                className: "bold"
+            }, e.prefix) : null, t ? r.createElement(i, {
                 playerIndex: e.playerIndex
             }) : null, r.createElement("span", {
                 className: "username"
@@ -18001,61 +18319,37 @@ console.log('Running modified generals-prod.js');
         DOWN: r("DOWN") || [83, 40],
         LEFT: r("LEFT") || [65, 37],
         RIGHT: r("RIGHT") || [68, 39],
-        CHAT: r("CHAT") || [13, 84],
+        CHAT: r("CHAT") || [13],
+        TEAMCHAT: r("TEAMCHAT") || [84],
         DESELECT: r("DESELECT") || [32],
         AUTOPLAY: r("AUTOPLAY") || [32],
         UNDO: r("UNDO") || [69],
         CLEAR: r("CLEAR") || [81],
         ZOOMIN: r("ZOOMIN") || [48],
-        ZOOMOUT: r("ZOOMOUT") || [57]
+        ZOOMOUT: r("ZOOMOUT") || [57],
+        PING: r("PING") || [70]
     }
 }
 , function(e, t, n) {
     "use strict";
-    function r(e, t, n, r) {
-        return Object.assign({
-            username: e[r.i] || "Anonymous",
-            stars: t ? t[r.i] : "",
-            team: n ? n[r.i] : void 0
-        }, r)
-    }
-    function o(e) {
-        return i.createElement("tr", {
-            className: 0 === e.tiles ? "dead" : e.dead ? "afk" : "",
-            key: "game-leaderboard-row" + e.i
-        }, Number.isInteger(e.team) ? i.createElement("td", {
-            key: "game-leaderboard-team" + e.i
-        }, e.team) : null, i.createElement("td", {
-            key: "game-leaderboard-stars" + e.i
-        }, " ", null !== e.stars ? i.createElement(v, {
-            stars: e.stars
-        }) : null, " "), i.createElement("td", {
-            key: "game-leaderboard-name" + e.i,
-            className: "leaderboard-name " + p.PLAYER_COLORS[e.i]
-        }, e.username), i.createElement("td", {
-            key: "game-leaderboard-score" + e.i
-        }, e.total), i.createElement("td", {
-            key: "game-leaderboard-tiles" + e.i
-        }, e.tiles))
-    }
-    var i = n(3)
-      , a = n(179)
-      , s = n(269)
-      , u = n(317)
-      , c = n(313)
-      , l = n(265)
-      , p = n(1)
-      , h = n(177)
-      , d = n(306)
-      , f = n(319).Tutorial
-      , m = n(211)
-      , v = n(297)
-      , y = n(288)
-      , g = n(303)
-      , T = (n(271),
-    n(320))
-      , b = n(308)
-      , S = i.createClass({
+    var r = n(3)
+      , o = n(179)
+      , i = n(269)
+      , a = n(319)
+      , s = n(315)
+      , u = n(265)
+      , c = (n(1),
+    n(177))
+      , l = n(307)
+      , p = n(321).Tutorial
+      , h = n(211)
+      , d = n(288)
+      , f = n(304)
+      , m = (n(271),
+    n(309))
+      , v = n(322)
+      , y = n(310)
+      , g = r.createClass({
         displayName: "GamePage",
         getInitialState: function() {
             return {
@@ -18063,26 +18357,26 @@ console.log('Running modified generals-prod.js');
                 useShareReplayStartTurn: !1
             }
         },
-        componentDidMount: function() {
-            this.showTeamsInLeaderboard = h.hasDuplicate(this.props.teams)
-        },
         exit: function() {
-            this.props.isReplay ? y.exitReplay() : m.leaveGame(),
-            l.dispatch(s.exit())
+            this.props.isReplay ? d.exitReplay() : h.leaveGame(),
+            u.dispatch(i.exit())
         },
         exitOrSpectate: function() {
-            this.props.canSpectate ? this.setState({
+            this.props.canSpectate && !this.props.ended ? this.setState({
                 isSpectating: !0
             }) : this.exit()
         },
-        focusChat: function() {
-            this.props.isLocalGame || document.getElementById("chatroom-input").focus()
+        focusChat: function(e) {
+            this.props.isLocalGame || (document.getElementById("chatroom-input").focus(),
+            this.setState({
+                isTeamChat: e
+            }))
         },
         toggleAutoPlay: function() {
-            l.dispatch(s.toggleAutoPlay())
+            u.dispatch(i.toggleAutoPlay())
         },
         setAutoPlaySpeed: function(e) {
-            l.dispatch(s.setAutoPlaySpeed(e))
+            u.dispatch(i.setAutoPlaySpeed(e))
         },
         shareReplay: function() {
             this.setState({
@@ -18116,7 +18410,7 @@ console.log('Running modified generals-prod.js');
         onReplayTurnJump: function() {
             var e = document.getElementById("replay-turn-jump-input")
               , t = parseInt(e.value);
-            Number.isInteger(t) && (y.jumpToTurn(t),
+            Number.isInteger(t) && (d.jumpToTurn(t),
             e.value = "",
             e.blur())
         },
@@ -18127,79 +18421,85 @@ console.log('Running modified generals-prod.js');
         watchReplay: function() {
             "undefined" != typeof ga && ga("send", "event", "Replay", "watch");
             var e = this.props.replay_id;
-            T.playAd(function() {
-                window.open("/replays/" + e)
+            window.open("/replays/" + e)
+        },
+        closeAd: function() {
+            this.setState({
+                hideReplayAd: !0
             })
         },
         render: function() {
-            var e;
-            this.props.scores && (e = this.props.scores.map(r.bind(null, this.props.usernames, this.props.stars, this.showTeamsInLeaderboard ? this.props.teams : null)).map(o));
-            var t = Number.isInteger(this.props.turn) ? Math.floor(this.props.turn / 2) : 0;
-            return i.createElement("div", {
+            var e = Number.isInteger(this.props.turn) ? Math.floor(this.props.turn / 2) : 0;
+            return r.createElement("div", {
                 id: "game-page"
-            }, i.createElement(u, {
+            }, r.createElement(a, {
                 scrollable: !this.props.lost && !this.props.won || this.props.canSpectate || this.state.isSpectating,
                 isReplay: this.props.isReplay,
                 toggleAutoPlay: this.toggleAutoPlay,
                 focusChat: this.focusChat
-            }), !this.state.isSpectating && this.props.lost ? i.createElement(d, {
+            }), !this.state.isSpectating && this.props.lost ? r.createElement(l, {
                 title: "Game Over",
-                body: i.createElement("span", null, "You were defeated by ", i.createElement("span", {
+                body: r.createElement("span", null, "You were defeated by ", r.createElement("span", {
                     style: {
                         fontFamily: "Quicksand-Bold"
                     }
                 }, this.props.usernames[this.props.gameOverData.killer]), "."),
-                button: this.props.canSpectate ? "Spectate" : "Exit",
+                button: this.props.canSpectate && !this.props.ended ? "Spectate" : "Exit",
                 button2: "Watch Replay",
                 onClick: this.exitOrSpectate,
                 onClick2: this.watchReplay
-            }) : null, !this.state.isSpectating && this.props.won ? this.props.isTutorial ? i.createElement(d, {
+            }) : null, !this.state.isSpectating && this.props.won ? this.props.isTutorial ? r.createElement(l, {
                 title: "You won!",
                 button: "Exit",
                 onClick: this.exit
-            }) : i.createElement(d, {
+            }) : r.createElement(l, {
                 title: "You won!",
                 button: "Exit",
                 button2: "Watch Replay",
                 onClick: this.exit,
                 onClick2: this.watchReplay
-            }) : null, this.props.isLocalGame ? null : i.createElement("div", {
+            }) : null, this.props.isLocalGame ? null : r.createElement("div", {
                 id: "in-game-chat"
-            }, i.createElement(c, {
+            }, r.createElement(s, {
                 chat_room: this.props.chat_room,
-                messages: this.props.chat_messages
-            })), i.createElement("table", {
-                id: "game-leaderboard"
-            }, i.createElement("tbody", null, i.createElement("tr", null, this.showTeamsInLeaderboard ? i.createElement("td", null, "Team") : null, i.createElement("td", null, " ", i.createElement(v, null), " "), i.createElement("td", null, "Player"), i.createElement("td", null, "Army"), i.createElement("td", null, "Land")), e)), i.createElement("div", {
+                team_chat_room: this.props.team_chat_room,
+                messages: this.props.chat_messages,
+                useTeamChat: c.hasDuplicate(this.props.teams) && this.state.isTeamChat
+            })), r.createElement(v, {
+                stars: this.props.stars,
+                scores: this.props.scores,
+                usernames: this.props.usernames,
+                teams: this.props.teams
+            }), r.createElement("div", {
                 id: "turn-counter"
-            }, "Turn ", t), this.props.isReplay ? i.createElement("div", {
+            }, "Turn ", e), this.props.isReplay ? r.createElement("div", {
                 id: "replay-top-left"
-            }, i.createElement("div", {
+            }, r.createElement("div", {
                 id: "replay-turn-jump",
                 className: "background"
-            }, "Jump to turn:", i.createElement("input", {
+            }, "Jump to turn:", r.createElement("input", {
                 type: "text",
                 id: "replay-turn-jump-input",
                 className: "unselectable",
                 placeholder: Math.floor(this.props.turn / 2),
                 onKeyDown: this.onReplayTurnJumpKeyDown
-            }), i.createElement("div", {
+            }), r.createElement("div", {
                 id: "replay-turn-jump-button",
                 className: "inline-button",
                 onClick: this.onReplayTurnJump
-            }, "→")), i.createElement("button", {
+            }, "→")), r.createElement("button", {
                 className: this.props.autoPlay ? "small inverted" : "small",
                 onClick: this.toggleAutoPlay,
                 style: {
                     display: "block"
                 }
-            }, "AutoPlay"), i.createElement("button", {
+            }, "AutoPlay"), r.createElement("button", {
                 className: "small",
                 onClick: this.exit,
                 style: {
                     display: "block"
                 }
-            }, "Exit")) : null, this.state.isSpectating ? i.createElement("button", {
+            }, "Exit")) : null, this.state.isSpectating ? r.createElement("button", {
                 className: "small",
                 onClick: this.exit,
                 style: {
@@ -18208,44 +18508,44 @@ console.log('Running modified generals-prod.js');
                     top: "35px",
                     left: "-10px"
                 }
-            }, "Exit") : null, this.props.isReplay ? i.createElement("button", {
+            }, "Exit") : null, this.props.isReplay ? r.createElement("button", {
                 className: "small",
                 id: "share-replay-button",
                 onClick: this.shareReplay
-            }, "Share Replay") : null, this.state && this.state.showingShareReplay ? i.createElement("div", {
+            }, "Share Replay") : null, this.state && this.state.showingShareReplay ? r.createElement("div", {
                 className: "popup-background",
                 style: {
                     zIndex: 50
                 }
-            }, i.createElement("div", {
+            }, r.createElement("div", {
                 id: "share-replay",
                 className: "alert center"
-            }, i.createElement("center", null, i.createElement("h2", {
+            }, r.createElement("center", null, r.createElement("h2", {
                 className: "unselectable",
                 style: {
                     color: "black"
                 }
-            }, "Share this Replay:"), i.createElement("p", {
+            }, "Share this Replay:"), r.createElement("p", {
                 className: "share-link inverted",
                 style: {
                     margin: "10px",
                     padding: "5px 20px"
                 }
-            }, "http://" + window.location.hostname + "/replays/" + this.props.replay_id + (this.state.useShareReplayStartTurn ? "?t=" + (this.state.shareReplayStartTurn || Math.floor(this.props.turn / 2)) : "")), i.createElement("input", {
+            }, "http://" + window.location.hostname + "/replays/" + this.props.replay_id + (this.state.useShareReplayStartTurn ? "?t=" + (this.state.shareReplayStartTurn || Math.floor(this.props.turn / 2)) : "")), r.createElement("input", {
                 type: "checkbox",
                 style: {
                     display: "inline-block"
                 },
                 checked: this.state.useShareReplayStartTurn,
                 onChange: this.onShareReplayUseTurnChange
-            }), i.createElement("p", {
+            }), r.createElement("p", {
                 className: "unselectable",
                 style: {
                     color: "black",
                     margin: "5px",
                     display: "inline-block"
                 }
-            }, "Start at Turn:"), i.createElement("input", {
+            }, "Start at Turn:"), r.createElement("input", {
                 type: "text",
                 className: "unselectable",
                 style: {
@@ -18258,29 +18558,45 @@ console.log('Running modified generals-prod.js');
                 value: this.state.shareReplayStartTurn,
                 onKeyDown: this.onShareReplayStartTimeKeyDown,
                 onChange: this.onShareReplayStartTimeChange
-            }), i.createElement("br", null), i.createElement("button", {
+            }), r.createElement("br", null), r.createElement("button", {
                 className: "small inverted unselectable",
                 style: {
                     marginTop: "15px"
                 },
                 onClick: this.exitShareReplay
-            }, "Exit")))) : null, this.props.isReplay ? i.createElement("div", {
-                id: "replay-bottom"
-            }, this.props.autoPlay ? i.createElement("center", null, i.createElement(b, {
+            }, "Exit")))) : null, this.props.isReplay ? r.createElement("div", {
+                id: "replay-bottom",
+                className: "fixed-center-horizontal"
+            }, r.createElement("center", null, this.props.autoPlay ? r.createElement(m, {
                 tab_id: "replay-autoplay",
                 selectedTab: .5 === this.props.autoPlaySpeed ? 0 : 1 === this.props.autoPlaySpeed ? 1 : 2 === this.props.autoPlaySpeed ? 2 : 5 === this.props.autoPlaySpeed ? 3 : 4,
                 onClicks: [this.setAutoPlaySpeed.bind(null, .5), this.setAutoPlaySpeed.bind(null, 1), this.setAutoPlaySpeed.bind(null, 2), this.setAutoPlaySpeed.bind(null, 5), this.setAutoPlaySpeed.bind(null, 10)],
                 titles: ["0.5x", "1x", "2x", "5x", "10x"]
-            })) : null, g ? null : i.createElement("div", {
+            }) : null, this.props.autoPlay && !f ? r.createElement("br", null) : null, f ? null : r.createElement("div", {
                 id: "replay-bottom-bar",
                 className: "background"
-            }, i.createElement("div", null, i.createElement("span", {
+            }, r.createElement("div", null, r.createElement("span", {
                 className: "bold"
-            }, "[←]"), i.createElement("br", null), "Back"), i.createElement("div", null, i.createElement("span", {
+            }, "[←]"), r.createElement("br", null), "Back"), r.createElement("div", null, r.createElement("span", {
                 className: "bold"
-            }, "[Spacebar]"), i.createElement("br", null), "Toggle Auto Play"), i.createElement("div", null, i.createElement("span", {
+            }, "[Spacebar]"), r.createElement("br", null), "Toggle Auto Play"), r.createElement("div", null, r.createElement("span", {
                 className: "bold"
-            }, "[→]"), i.createElement("br", null), "Next Move"))) : null, this.props.isTutorial ? i.createElement(f, {
+            }, "[→]"), r.createElement("br", null), "Next Move")), this.state && this.state.hideReplayAd ? null : r.createElement("div", {
+                id: "replay-ad-container"
+            }, r.createElement("button", {
+                onClick: this.closeAd,
+                className: "small",
+                style: {
+                    boxShadow: "none",
+                    margin: 0,
+                    padding: "3px 15px",
+                    fontSize: "12px"
+                }
+            }, "Hide ad"), r.createElement(y, {
+                id: "div-gpt-ad-1484365524244-2",
+                width: 728,
+                height: 90
+            })))) : null, this.props.isTutorial ? r.createElement(p, {
                 state: this.props.tutorialState,
                 scores: this.props.scores,
                 playerIndex: this.props.playerIndex,
@@ -18292,40 +18608,44 @@ console.log('Running modified generals-prod.js');
             }) : null)
         }
     });
-    e.exports = a.connect(function(e) {
+    e.exports = o.connect(function(e) {
         var t = e.game.chat_room;
         return Object.assign({
             chat_messages: e.chat[t] || []
         }, e.game)
-    })(S)
+    })(g)
 }
 , function(e, t, n) {
     "use strict";
     function r(e) {
         switch (e) {
-        case d:
+        case y:
             return "large";
-        case m:
+        case T:
             return "small";
-        case v:
+        case b:
             return "tiny"
         }
     }
     var o = n(3)
       , i = n(179)
-      , a = n(318)
+      , a = n(320)
       , s = n(211)
       , u = n(273)
-      , c = n(319)
+      , c = n(321)
       , l = n(288)
-      , p = n(303)
-      , h = n(315)
-      , d = -1
-      , f = 0
-      , m = 1
-      , v = 2
-      , y = 50
-      , g = o.createClass({
+      , p = n(304)
+      , h = n(317)
+      , d = n(1)
+      , f = n(177)
+      , m = n(287)
+      , v = 3
+      , y = -1
+      , g = 0
+      , T = 1
+      , b = 2
+      , S = 50
+      , E = o.createClass({
         displayName: "GameMap",
         getInitialState: function() {
             return {
@@ -18336,7 +18656,7 @@ console.log('Running modified generals-prod.js');
                 },
                 attackIndex: 1,
                 queuedAttacks: [],
-                zoom: p ? m : f,
+                zoom: p ? this.props.isReplay ? b : T : g,
                 wheel: 0
             }
         },
@@ -18354,6 +18674,21 @@ console.log('Running modified generals-prod.js');
                 queuedAttacks: []
             }),
             s.clearMoves()
+        },
+        enablePingMode: function() {
+            this.setState({
+                inPingMode: !0
+            })
+        },
+        disablePingMode: function() {
+            this.setState({
+                inPingMode: !1
+            })
+        },
+        pingTile: function(e) {
+            s.pingTile(e),
+            m && (m.has_pinged = !0),
+            this.forceUpdate()
         },
         componentDidMount: function() {
             // Begin Modified Code
@@ -18373,8 +18708,7 @@ console.log('Running modified generals-prod.js');
             window.removeEventListener("keydown", this.onKeyDown)
         },
         shouldComponentUpdate: function(e, t) {
-            return this.props !== e || this.state.selectedIndex !== t.selectedIndex || this.state.selectedIs50 !== t.selectedIs50 || this.state.offset !== t.offset || this.state.queuedAttacks !== t.queuedAttacks || this.state.zoom !== t.zoom
-
+            return this.props !== e || this.state.selectedIndex !== t.selectedIndex || this.state.selectedIs50 !== t.selectedIs50 || this.state.offset !== t.offset || this.state.queuedAttacks !== t.queuedAttacks || this.state.zoom !== t.zoom || this.state.inPingMode !== t.inPingMode
         },
         componentWillReceiveProps: function(e) {
             if (e.attackIndex > this.props.attackIndex) {
@@ -18402,19 +18736,26 @@ console.log('Running modified generals-prod.js');
             }
         },
         onKeyDown: function(e) {
+            if (this.state.inPingMode)
+                return void this.disablePingMode();
             if (h.ZOOMIN.indexOf(e.keyCode) !== -1)
-                return void (this.state.zoom > d && this.setState({
+                return void (this.state.zoom > y && this.setState({
                     zoom: this.state.zoom - 1
                 }));
             if (h.ZOOMOUT.indexOf(e.keyCode) !== -1)
-                return void (this.state.zoom < v && this.setState({
+                return void (this.state.zoom < b && this.setState({
                     zoom: this.state.zoom + 1
                 }));
             if (this.props.isReplay)
                 return void (h.AUTOPLAY.indexOf(e.keyCode) !== -1 ? this.props.toggleAutoPlay() : h.RIGHT.indexOf(e.keyCode) !== -1 ? l.nextReplayTurn() : h.LEFT.indexOf(e.keyCode) !== -1 && l.backReplay());
             if (e.preventDefault(),
             e.stopPropagation(),
-            h.UNDO.indexOf(e.keyCode) !== -1)
+            h.PING.indexOf(e.keyCode) !== -1) {
+                if (!f.hasDuplicate(this.props.teams))
+                    return;
+                return void this.enablePingMode()
+            }
+            if (h.UNDO.indexOf(e.keyCode) !== -1)
                 return void this.undoQueuedAttack();
             if (h.CLEAR.indexOf(e.keyCode) !== -1)
                 return void this.clearQueuedAttacks();
@@ -18423,7 +18764,9 @@ console.log('Running modified generals-prod.js');
                     selectedIndex: -1
                 });
             if (h.CHAT.indexOf(e.keyCode) !== -1)
-                return void this.props.focusChat();
+                return void this.props.focusChat(!1);
+            if (h.TEAMCHAT.indexOf(e.keyCode) !== -1)
+                return void this.props.focusChat(!0);
             if (!(this.state.selectedIndex < 0)) {
                 var t = Math.floor(this.state.selectedIndex / this.props.map.width)
                   , n = this.state.selectedIndex % this.props.map.width
@@ -18454,7 +18797,10 @@ console.log('Running modified generals-prod.js');
             var n = this.props.map;
             if (!(e < 0 || t < 0 || e >= n.height || t >= n.width)) {
                 var r = n.indexFrom(e, t);
-                if (this.state.selectedIndex < 0)
+                if (this.state.inPingMode)
+                    this.pingTile(r),
+                    this.disablePingMode();
+                else if (this.state.selectedIndex < 0)
                     this.setState({
                         selectedIndex: n.indexFrom(e, t),
                         selectedIs50: !1
@@ -18485,14 +18831,19 @@ console.log('Running modified generals-prod.js');
                 }
             }
         },
-        onTileMouseDown: function(e, t, n) {
-            this.setState({
+        onTileMouseDown: function(e, t, n, r) {
+            r.nativeEvent.which === v ? this.setState({
+                pingCoordinates: {
+                    row: e,
+                    col: t
+                }
+            }) : n && this.setState({
                 tileCoordinates: {
                     row: e,
                     col: t
                 }
             }),
-            this.onMouseDown(n, !0)
+            this.onMouseDown(r, n)
         },
         onMouseDown: function(e, t) {
             document.activeElement.blur(),
@@ -18510,7 +18861,7 @@ console.log('Running modified generals-prod.js');
         },
         onWheel: function(e) {
             var t = this.state.wheel + e.deltaY;
-            Math.abs(t) > y && (this.onKeyDown({
+            Math.abs(t) > S && (this.onKeyDown({
                 keyCode: t < 0 ? h.ZOOMIN[0] : h.ZOOMOUT[0]
             }),
             t = 0),
@@ -18521,10 +18872,11 @@ console.log('Running modified generals-prod.js');
         onMouseMove: function(e) {
             if (e = this.convertTouchIfMobile(e),
             this.state.prevMouseLocation && this.state.mouseDownLocation)
-                if (this.state.tileCoordinates) {
+                if (this.state.tileCoordinates || this.state.pingCoordinates) {
                     var t = Math.pow(e.clientX - this.state.mouseDownLocation.x, 2) + Math.pow(e.clientY - this.state.mouseDownLocation.y, 2);
                     t >= 625 && this.setState({
-                        tileCoordinates: null
+                        tileCoordinates: null,
+                        pingCoordinates: null
                     })
                 } else
                     c.onDrag && c.onDrag(),
@@ -18536,11 +18888,12 @@ console.log('Running modified generals-prod.js');
                     }),
                     this.setPrevMouseLocation(e)
         },
-        onMouseUp: function() {
-            this.state.tileCoordinates && this.onTileClick(this.state.tileCoordinates.row, this.state.tileCoordinates.col),
+        onMouseUp: function(e) {
+            this.state.tileCoordinates ? this.onTileClick(this.state.tileCoordinates.row, this.state.tileCoordinates.col) : this.state.pingCoordinates && f.hasDuplicate(this.props.teams) && this.pingTile(this.props.map.indexFrom(this.state.pingCoordinates.row, this.state.pingCoordinates.col)),
             this.setState({
                 prevMouseLocation: null,
-                tileCoordinates: null
+                tileCoordinates: null,
+                pingCoordinates: null
             })
         },
         convertTouchIfMobile: function(e) {
@@ -18562,22 +18915,14 @@ console.log('Running modified generals-prod.js');
             !1
         },
         render: function() {
+            var e = m && !m.has_pinged;
             return o.createElement("div", {
                 className: "relative",
                 style: {
                     top: this.state.offset.y,
                     left: this.state.offset.x
                 }
-            }, o.createElement(T, {
-                props: this.props,
-                queuedAttacks: this.state.queuedAttacks,
-                selectedIndex: this.state.selectedIndex,
-                selectedIs50: this.state.selectedIs50,
-                onTileMouseDown: this.onTileMouseDown,
-                onMouseMove: this.onMouseMove,
-                onMouseUp: this.onMouseUp,
-                zoomClass: this.state ? r(this.state.zoom) : null
-            }), this.props.scrollable ? o.createElement("div", {
+            }, this.props.scrollable ? o.createElement("div", {
                 className: "game-scroll",
                 onMouseDown: this.onMouseDown,
                 onTouchStart: this.onMouseDown,
@@ -18587,10 +18932,43 @@ console.log('Running modified generals-prod.js');
                 onTouchEnd: this.onMouseUp,
                 onWheel: this.onWheel,
                 onContextMenu: this.onContextMenu
-            }) : null)
+            }) : null, o.createElement(A, {
+                props: this.props,
+                queuedAttacks: this.state.queuedAttacks,
+                selectedIndex: this.state.selectedIndex,
+                selectedIs50: this.state.selectedIs50,
+                onTileMouseDown: this.onTileMouseDown,
+                onMouseMove: this.onMouseMove,
+                onMouseUp: this.onMouseUp,
+                onWheel: this.onWheel,
+                zoomClass: this.state ? r(this.state.zoom) : null,
+                inPingMode: this.state && this.state.inPingMode
+            }), this.state && this.state.inPingMode ? o.createElement("div", {
+                className: "background center",
+                style: {
+                    zIndex: "30",
+                    whiteSpace: "nowrap",
+                    position: "fixed",
+                    top: "100px",
+                    padding: "5px"
+                }
+            }, "Click on a tile to ping it.") : null, f.hasDuplicate(this.props.teams) && e ? o.createElement("div", {
+                className: "background center",
+                style: {
+                    zIndex: "30",
+                    textAlign: "center",
+                    position: "fixed",
+                    top: "50px",
+                    padding: "5px"
+                }
+            }, o.createElement("span", {
+                className: "bold"
+            }, "Right click"), " a tile to ping it to your teammate (if any), or ", o.createElement("span", {
+                className: "bold"
+            }, "press [F]"), " to enable ping mode.") : null)
         }
     })
-      , T = o.createClass({
+      , A = o.createClass({
         displayName: "Tiles",
         shouldComponentUpdate: function(e) {
             return this.props.props !== e.props || this.props.queuedAttacks !== e.queuedAttacks || this.props.selectedIndex !== e.selectedIndex || this.props.selectedIs50 !== e.selectedIs50 || this.props.zoomClass !== e.zoomClass
@@ -18607,47 +18985,57 @@ console.log('Running modified generals-prod.js');
                 i[t] || (i[t] = {}),
                 n === t + 1 ? i[t].right = !0 : n === t - 1 ? i[t].left = !0 : n > t ? i[t].down = !0 : i[t].up = !0
             });
-            for (var s = [], c = 0; c < r; c++) {
-                for (var l = [], p = 0; p < t.width; p++) {
-                    var h = t.indexFrom(c, p)
-                      , d = t.tileAt(h)
-                      , f = d === n
-                      , m = h === this.props.selectedIndex
-                      , v = this.props.selectedIndex >= 0 && t.isAdjacent(this.props.selectedIndex, h) && d !== u.TILE_MOUNTAIN;
-                    l.push(o.createElement(a, {
-                        row: c,
-                        col: p,
-                        key: c + "tile" + p,
-                        number: t.armyAt(t.indexFrom(c, p)),
-                        tile: d,
-                        isSelectable: f,
-                        isSelected: m,
-                        isSelected50: m && this.props.selectedIs50,
-                        isAttackable: v,
-                        isGeneral: e.generals && e.generals.indexOf(h) >= 0,
-                        isCity: e.cities && e.cities.indexOf(h) >= 0,
-                        onMouseDown: f || v ? this.props.onTileMouseDown.bind(null, c, p) : null,
+            var s = e.pings || [];
+            s = s.filter(function(e) {
+                return Date.now() - e.timestamp <= d.PING_DURATION
+            }).map(function(e) {
+                return e.tileIndex
+            });
+            for (var c = [], l = 0; l < r; l++) {
+                for (var p = [], h = 0; h < t.width; h++) {
+                    var f = t.indexFrom(l, h)
+                      , m = t.tileAt(f)
+                      , v = m === n
+                      , y = f === this.props.selectedIndex
+                      , g = this.props.selectedIndex >= 0 && t.isAdjacent(this.props.selectedIndex, f) && m !== u.TILE_MOUNTAIN
+                      , T = this.props.inPingMode || v;
+                    p.push(o.createElement(a, {
+                        row: l,
+                        col: h,
+                        key: l + "tile" + h,
+                        number: t.armyAt(t.indexFrom(l, h)),
+                        tile: m,
+                        isSelectable: T,
+                        isSelected: y,
+                        isSelected50: y && this.props.selectedIs50,
+                        isAttackable: g,
+                        isGeneral: e.generals && e.generals.indexOf(f) >= 0,
+                        isCity: e.cities && e.cities.indexOf(f) >= 0,
+                        isPinged: s.indexOf(f) >= 0,
+                        onMouseDown: this.props.onTileMouseDown.bind(null, l, h, v || g || T),
                         onMouseMove: this.props.onMouseMove,
                         onMouseUp: this.props.onMouseUp,
-                        arrows: i[h],
+                        onWheel: this.props.onWheel,
+                        arrows: i[f],
                         zoomClass: this.props.zoomClass
                     }))
                 }
-                s.push(o.createElement("tr", {
-                    key: "row" + c
-                }, l))
+                c.push(o.createElement("tr", {
+                    key: "row" + l
+                }, p))
             }
             return o.createElement("table", {
                 id: "map",
+                className: this.props.inPingMode ? "pingmode" : "",
                 style: {
                     borderSpacing: 0
                 }
-            }, o.createElement("tbody", null, s))
+            }, o.createElement("tbody", null, c))
         }
     });
     e.exports = i.connect(function(e) {
         return e.game
-    }, null)(g)
+    }, null)(E)
 }
 , function(e, t, n) {
     "use strict";
@@ -18665,13 +19053,14 @@ console.log('Running modified generals-prod.js');
               , t = this.props.tile === i.TILE_MOUNTAIN
               , n = this.props.tile === i.TILE_FOG_OBSTACLE
               , a = o.PLAYER_COLORS[this.props.tile] || "";
-            return this.props.isSelectable && (a += " selectable"),
-            this.props.isSelected && (a += " selected"),
-            this.props.isSelected50 && (a += " selected50"),
+            return this.props.isSelected50 && (a += " selected50"),
             this.props.isAttackable && (a += " attackable"),
             this.props.isGeneral ? a += " general" : this.props.isCity ? a += " city" : this.props.number > 0 && (a += " neutral"),
+            !this.props.isPinged && this.props.isSelected && (a += " selected"),
             e && (a = "fog"),
             t ? a = e ? "fog mountain" : "mountain" : n && (a = "fog obstacle"),
+            t || (this.props.isSelectable && (a += " selectable"),
+            this.props.isPinged && (a += " selected")),
             this.props.zoomClass && (a += " " + this.props.zoomClass),
             r.createElement("td", {
                 className: a,
@@ -18681,6 +19070,7 @@ console.log('Running modified generals-prod.js');
                 onTouchMove: this.props.onMouseMove,
                 onMouseUp: this.props.onMouseUp,
                 onTouchEnd: this.props.onMouseUp,
+                onWheel: this.props.onWheel,
                 onContextMenu: this.onContextMenu
             }, e ? "" : this.props.isSelected50 ? "50%" : this.props.number || "", this.props.arrows && this.props.arrows.right ? r.createElement("div", {
                 className: "center-vertical",
@@ -18702,7 +19092,15 @@ console.log('Running modified generals-prod.js');
                 style: {
                     bottom: 0
                 }
-            }, "↓") : null)
+            }, "↓") : null, this.props.isPinged ? e || !this.props.number ? r.createElement("div", {
+                className: "ping center"
+            }, "⚑") : r.createElement("div", {
+                className: "ping center",
+                style: {
+                    top: "8px",
+                    left: "8px"
+                }
+            }, "⚑") : null)
         }
     });
     e.exports = a
@@ -18714,7 +19112,7 @@ console.log('Running modified generals-prod.js');
       , i = n(30)
       , a = n(265)
       , s = n(269)
-      , u = n(303)
+      , u = n(304)
       , c = o.createClass({
         displayName: "Tutorial",
         moveToState: function(e) {
@@ -18795,52 +19193,61 @@ console.log('Running modified generals-prod.js');
     };
     e.exports = l
 }
-, function(e, t) {
+, function(e, t, n) {
     "use strict";
-    if ("?aip=1" === window.location.search) {
-        var n = function(e, t) {
-            var n = document.head || document.getElementsByTagName("head")[0]
-              , r = document.createElement("script")
-              , o = !0;
-            r.async = "async",
-            r.type = "text/javascript",
-            r.charset = "UTF-8",
-            r.src = e,
-            r.onload = r.onreadystatechange = function() {
-                !o || r.readyState && !/loaded|complete/.test(r.readyState) || (o = !1,
-                t(),
-                r.onload = r.onreadystatechange = null)
+    var r = n(3)
+      , o = n(297)
+      , i = n(1)
+      , a = n(177)
+      , s = n(304)
+      , u = r.createClass({
+        displayName: "InGameLeaderboard",
+        getInitialState: function() {
+            return {
+                minimized: s
             }
-            ,
-            n.appendChild(r)
+        },
+        componentWillMount: function() {
+            this.showTeamsInLeaderboard = a.hasDuplicate(this.props.teams)
+        },
+        toggleMinimize: function() {
+            this.setState({
+                minimized: !this.state.minimized
+            })
+        },
+        renderRow: function(e) {
+            var t = this.props.usernames[e.i] || "Anonymous"
+              , n = this.props.stars ? this.props.stars[e.i] : ""
+              , a = this.props.teams ? this.props.teams[e.i] : void 0;
+            return this.state.minimized && (t = " "),
+            r.createElement("tr", {
+                className: 0 === e.tiles ? "dead" : e.dead ? "afk" : "",
+                key: "game-leaderboard-row" + e.i
+            }, this.showTeamsInLeaderboard && !this.state.minimized ? r.createElement("td", {
+                key: "game-leaderboard-team" + e.i
+            }, a) : null, this.state.minimized ? null : r.createElement("td", {
+                key: "game-leaderboard-stars" + e.i
+            }, " ", null !== n ? r.createElement(o, {
+                stars: n
+            }) : null, " "), r.createElement("td", {
+                key: "game-leaderboard-name" + e.i,
+                className: "leaderboard-name " + i.PLAYER_COLORS[e.i]
+            }, t), r.createElement("td", {
+                key: "game-leaderboard-score" + e.i
+            }, e.total), r.createElement("td", {
+                key: "game-leaderboard-tiles" + e.i
+            }, e.tiles))
+        },
+        render: function() {
+            if (this.props.scores)
+                var e = this.props.scores.map(this.renderRow);
+            return r.createElement("table", {
+                id: "game-leaderboard",
+                onClick: this.toggleMinimize
+            }, r.createElement("tbody", null, r.createElement("tr", null, this.showTeamsInLeaderboard && !this.state.minimized ? r.createElement("td", null, "Team") : null, this.state.minimized ? null : r.createElement("td", null, " ", r.createElement(o, null), " "), this.state.minimized ? r.createElement("td", null, " ") : r.createElement("td", null, "Player"), r.createElement("td", null, "Army"), r.createElement("td", null, "Land")), e))
         }
-          , r = function() {
-            "undefined" != typeof aipPlayer && (o = new aipPlayer({
-                AD_WIDTH: 960,
-                AD_HEIGHT: 540,
-                AD_FULLSCREEN: !0,
-                PREROLL_ELEM: document.getElementById("aip-preroll"),
-                AIP_COMPLETE: function() {
-                    i && (i(),
-                    i = null)
-                },
-                AIP_REMOVE: function() {}
-            }))
-        };
-        n("//api.adinplay.com/player/v2/GNR/generals.io/player.min.js", r);
-        var o, i;
-        e.exports = {
-            playAd: function(e) {
-                o ? (i = e,
-                o.startPreRoll()) : e()
-            }
-        }
-    } else
-        e.exports = {
-            playAd: function(e) {
-                e()
-            }
-        }
+    });
+    e.exports = u
 }
 , function(e, t, n) {
     "use strict";
