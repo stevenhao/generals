@@ -16,6 +16,7 @@
 
 var BetterControls = (function() {
     var running = false;
+    var myGameMap = null;
 
     var FIFTY = [16]; // shiftleft
     function onKeyDown(e, t) {
@@ -46,9 +47,9 @@ var BetterControls = (function() {
                 , n = this.state.selectedIndex % this.props.map.width
                 , r = 0
                 , o = 0;
-            if (FIFTY.indexOf(e.keyCode) !== -1)
+            if (FIFTY.indexOf(e.keyCode) !== -1) {
                 this.setState({selectedIs50: !this.state.selectedIs50});
-            
+            }
             if (h.LEFT.indexOf(e.keyCode) !== -1)
                 o = -1;
             else if (h.UP.indexOf(e.keyCode) !== -1)
@@ -64,14 +65,17 @@ var BetterControls = (function() {
                 , a = n + o
                 , s = this.props.map.tileAt(this.props.map.indexFrom(i, a));
             s !== u.TILE_MOUNTAIN ? (this.onTileClick(i, a),
-                (s === this.props.playerIndex || this.props.teams && this.props.teams[s] === this.props.teams[this.props.playerIndex]) && this.onTileClick(i, a),
+                // previously, there was another onTileClick(i, a) call.. this is no longer necessary as our onTileClick will auto-select (i,a)
                 c.onWASD && c.onWASD()) : this.setState({
-                    selectedIndex: -1
+                    //begin modified code
+                    //selectedIndex: -1,
+                    // end modified code
                 })
         }
     }
 
     function onTileClick(e, t) {
+        console.log('onTileClick');
         var n = this.props.map;
         if (!(e < 0 || t < 0 || e >= n.height || t >= n.width)) {
             var r = n.indexFrom(e, t);
@@ -87,20 +91,20 @@ var BetterControls = (function() {
                     selectedIs50: !0
                 });
             else {
-                 // begin modified code
-                 var curColor = this.props.map.tileAt(this.state.selectedIndex);
-                 if (!(curColor === this.props.playerIndex || (curColor !== -1 && this.props.teams && this.props.teams[s] === this.props.teams[curColor]))) {
-                     return;
-                 }
-                 // end modified code
+                // begin modified code
+                var curColor = this.props.map.tileAt(this.state.selectedIndex);
+                var canMove = (curColor === this.props.playerIndex ||
+                    (curColor !== -1 && this.props.teams &&
+                    this.props.teams[s] === this.props.teams[curColor]));
+                // end modified code
                 var o = {
                     selectedIndex: -1
                 };
                 //begin modified code
                 o.selectedIndex = r;
-                o.selectedIs50 = 0;
+                o.selectedIs50 = !1;
                 //end modified code
-                if (n.isAdjacent(r, this.state.selectedIndex) && r !== this.state.selectedIndex) {
+                if (canMove && n.isAdjacent(r, this.state.selectedIndex)) {
                     var i = this.state.selectedIndex;
                     s.attack(i, r, this.state.selectedIs50, this.state.attackIndex);
                     Object.assign(o, {
@@ -112,19 +116,33 @@ var BetterControls = (function() {
                         attackIndex: this.state.attackIndex + 1
                     })
                 }
-                this.setState(o)
+
+                // begin modified code
+                // only set state when jumping or successfully moving
+                // do NOT set state when attempting to queue a move when you don't own selectedIndex yet
+                if (!n.isAdjacent(r, this.state.selectedIndex) || canMove) {
+                    this.setState(o)
+                }
+                //this.setState(o)
+                // end modified code
             }
         }
     }
     function start() {
         if (running) return; // already runnnig
-        if (!window.GameMap) return; // not running modified code
+        if (!(window.GameMap && window.GameMap.isMounted())) return; // not running modified code OR map is old
+        myGameMap = window.GameMap;
 
-        window.removeEventListener("keydown", window.GameMap.onKeyDown)
-        window.GameMap.onKeyDown = onKeyDown.bind(window.GameMap);
-        window.addEventListener("keydown", window.GameMap.onKeyDown)
-        window.GameMap.onTileClick = onTileClick;
+        window.removeEventListener("keydown", myGameMap.onKeyDown)
+        myGameMap.onKeyDown = onKeyDown.bind(myGameMap);
+        window.addEventListener("keydown", myGameMap.onKeyDown)
+        myGameMap.onTileClick = onTileClick;
         running = true;
+        setInterval(function() {
+            if (!myGameMap.isMounted()) {
+                stop();
+            }
+        }, 1000);
     }
     function stop() {
         if (running) {

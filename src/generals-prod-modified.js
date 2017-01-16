@@ -18362,6 +18362,7 @@ console.log('Running modified generals-prod.js');
             window.u = u;
             window.c = c;
             window.s = s;
+            window.d = d;
             window.v = v;
             window.l = l;
             window.h = h;
