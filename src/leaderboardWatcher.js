@@ -52,7 +52,6 @@ var LeaderboardWatcher = (function() {
             }
             console.log('watching leaderboard...');
         } catch (ex) {
-            console.log('failed to start');
             return;
         }
 

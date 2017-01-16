@@ -43,7 +43,6 @@ var GeneralsHighlighter = (function() {
         if (watchIntvl) {
             stop();
         }
-        console.log('starting generals highligter');
 
         watchIntvl = setInterval(function() {
             try {
@@ -51,7 +50,6 @@ var GeneralsHighlighter = (function() {
                 update();
                 squares.map(idx => cells[idx]).forEach(markCell);
             } catch(ex) {
-                console.log(ex);
                 stop();
             }
         }, 500);
@@ -60,7 +58,6 @@ var GeneralsHighlighter = (function() {
     function stop() {
         clearInterval(watchIntvl);
         watchIntvl = 0;
-        console.log('no longer highlighting generals.');
     }
 
     var result = {

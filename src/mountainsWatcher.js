@@ -99,7 +99,6 @@ var MountainsWatcher = (function() {
             console.log('initial mountains: ', initialMountains);
             console.log('watching mountains...');
         } catch (ex) {
-            console.log('failed to start');
             return;
         }
         
