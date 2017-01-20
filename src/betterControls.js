@@ -106,7 +106,7 @@ var BetterControls = (function() {
                 var curColor = this.props.map.tileAt(this.state.selectedIndex);
                 var canMove = (curColor === this.props.playerIndex ||
                     (curColor !== -1 && this.props.teams &&
-                    this.props.teams[s] === this.props.teams[curColor]));
+                    this.props.teams[this.props.playerIndex] === this.props.teams[curColor]));
                 // end modified code
                 var o = {
                     selectedIndex: -1
