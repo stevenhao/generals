@@ -15934,7 +15934,9 @@ console.log('Running modified generals-prod.js');
                         id: "replay-turn-jump-button",
                         className: "inline-button",
                         onClick: this.onReplayTurnJump
-                    }, "â†’")), r.createElement("button", {
+                    // begin modified code
+                    }, "→")), r.createElement("button", {
+                    // end modified code
                         className: this.props.autoPlay ? "small inverted" : "small",
                         onClick: this.toggleAutoPlay,
                         style: {
@@ -16024,12 +16026,14 @@ console.log('Running modified generals-prod.js');
                         className: "background"
                     }, r.createElement("div", null, r.createElement("span", {
                         className: "bold"
-                    }, "[â†]"), r.createElement("br", null), "Back"), r.createElement("div", null, r.createElement("span", {
+                    // begin modified code
+                    }, "[←]"), r.createElement("br", null), "Back"), r.createElement("div", null, r.createElement("span", {
                         className: "bold"
                     }, "[Spacebar]"), r.createElement("br", null), "Toggle Auto Play"), r.createElement("div", null, r.createElement("span", {
                         className: "bold"
-                    }, "[â†’]"), r.createElement("br", null), "Next Move")), this.state && this.state.hideReplayAd ? null : r.createElement("div", {
+                    }, "[→]"), r.createElement("br", null), "Next Move")), this.state && this.state.hideReplayAd ? null : r.createElement("div", {
                         id: "replay-ad-container"
+                    // end modified code
                     }, r.createElement("button", {
                         onClick: this.closeAd,
                         className: "small",
