@@ -14,7 +14,7 @@ A collection of scripts for the game [generals.io](www.generals.io).
 
 - **AutoPan**: Automatically and smoothly moves the map to keep your currently selected square comfortably visible. Accounting for variable window sizes, this script will ensure that all squares within a radius of 3 of the selected square are located in the visible part of the document window.
 
-- **DvorakControls**: For dvorak typists; you no longer need to switch to QWERTY to play the game.
+- **DvorakControls**: Allows dvorak typists to play the game without switching to QWERTY.
 
 ## Setup with TamperMonkey
 
