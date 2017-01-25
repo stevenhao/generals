@@ -35,9 +35,13 @@ Array.prototype.remove = function(needle) {
 // Interfacing with the DOM
 
 function getCells() {
-    var map = document.getElementById('map');
-    var rows = map.childNodes[0].childNodes;
-    return toArray(rows).flatMap(row => toArray(row.childNodes));
+    try {
+        var map = document.getElementById('map');
+        var rows = map.childNodes[0].childNodes;
+        return toArray(rows).flatMap(row => toArray(row.childNodes));
+    } catch (e) {
+        return [];
+    }
 }
 
 // ==================================
