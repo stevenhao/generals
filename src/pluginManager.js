@@ -58,8 +58,12 @@ var Settings = (function() {
 }());
 
 var SettingNames = {
-    autorun: function(plugin) {
-        return 'autorun-' + plugin.name;
+    autorun: function(plugin, isReplay) {
+        if (isReplay) {
+            return 'autorun-replay-' + plugin.name;
+        } else {
+            return 'autorun-' + plugin.name;
+        }
     },
 };
 
@@ -80,6 +84,7 @@ var Generals = (function() {
 
     // only call this when Generals && Generals.ready() is true.
     function addPlugin(plugin) {
+        var isReplay = window.location.pathname.indexOf('/replays/') !== -1;
         var button = document.createElement('button');
         button.style.cssText = 'font-size: 14px; padding: 2px 4px';
         button.innerHTML = plugin.name;
@@ -97,7 +102,7 @@ var Generals = (function() {
         }, 1000);
 
         // draw checkbox for autorun setting
-        var autorunSetting = SettingNames.autorun(plugin);
+        var autorunSetting = SettingNames.autorun(plugin, isReplay);
         var checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.checked = Settings.get(autorunSetting) === 'on';
