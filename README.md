@@ -4,7 +4,7 @@ A collection of scripts for the game [generals.io](www.generals.io).
 
 # List of scripts
 
-- **MountainsWatcher (for FFA)**: Watches for new obstacles/mountains appearing in the map. This reveals the location of captured generals, as generals don't show up as obstacles in the fog of war, but cities do.
+- **MountainsWatcher (for FFA)**: Watches for new obstacles/mountains appearing in the map. This reveals the location of captured generals. The script consults the chat log to determine the color of the player that captured the general, and highlights the square containing the captured general with that color. Explanation: *When a general is captured, it turns into a city. Generals don't show up as obstacles in the fog of war, but cities do, so any new city/obstacle must be a newly-captured general.*
 
 - **LeaderboardWatcher**: Watches the leaderboard for changes in army size. Allows you to easily read off how many cities a player has, whether the player is in a fight, whether the player just captured a city, etc.
 
