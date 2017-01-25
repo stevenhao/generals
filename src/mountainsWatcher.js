@@ -109,6 +109,10 @@ var MountainsWatcher = (function() {
                 var newMountains = currentMountains.filter(idx => !initialMountains.contains(idx));
                 // only mark new dead locations
                 var newDeadGenerals = newMountains.filter(idx => !deadGenerals.contains(idx))
+              if (newDeadGenerals.length > 10) {
+                initialMountains = getCityCells(); // must be a mistake!
+                return;
+              }
                 for (var i = 0; i < newMountains.length; i++) {
                     deadGenerals.push(newDeadGenerals[i]);
                 }
