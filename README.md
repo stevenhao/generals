@@ -34,10 +34,10 @@ The script may look something like this:
 // @version 0.1
 // @description Source the generals script from file system
 // @match http://generals.io/*
-// @require file://path/to/repo/src/PluginsManager.js
-// @require file://path/to/repo/src/MountainsWatcher.js
+// @require file://path/to/repo/src/pluginManager.js
+// @require file://path/to/repo/src/mountainsWatcher.js
 // @require file://path/to/repo/src/generals-prod-modified.js
-// @require file://path/to/repo/src/BetterControls.js
+// @require file://path/to/repo/src/betterControls.js
 // @require ...
 // ==/UserScript==
 ```
