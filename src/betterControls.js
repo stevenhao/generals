@@ -14,11 +14,41 @@
 // This allows for better keyboard controls
 // Requires modified generals-prod.js -- see Readme for more instructions
 
+// begin modified code
+window.FIFTY = [16]; // shiftleft
+window.FREE = [70]; // qwerty-f key. overrides "PING", seems unimportant
+// end modified code
+
 var BetterControls = (function() {
     var running = false;
     var myGameMap = null;
+    var freeMoving = false; // should we reselect squares without attacking?
+
+    function toggleFreeMoving() {
+        freeMoving = !freeMoving;
+        document.body.className = freeMoving ? 'freeMoving' : '';
+    }
+
+    function addFreemovingStyle() {
+        var style = document.createElement('style');
+        style.innerHTML = '.freeMoving #map td.selected { opacity: .50; }';
+        document.body.appendChild(style);
+    }
+    addFreemovingStyle();
 
     function onKeyDown(e) {
+        // begin modified code
+        if (e.metaKey) return; // allow command-r to refresh, etc
+        if (FIFTY.indexOf(e.keyCode) !== -1) {
+            this.setState({selectedIs50: !this.state.selectedIs50});
+            return;
+        }
+        console.log(e.keyCode);
+        if (FREE.indexOf(e.keyCode) !== -1) {
+            toggleFreeMoving();
+            return;
+        }
+        // end modified code
         if (this.state.inPingMode) return void this.disablePingMode();
         if (m("ZOOMIN").indexOf(e.keyCode) !== -1) return void(this.state.zoom > y && this.setState({
             zoom: this.state.zoom - 1
@@ -53,7 +83,11 @@ var BetterControls = (function() {
             var i = t + r,
                 a = n + o,
                 s = this.props.map.tileAt(this.props.map.indexFrom(i, a));
-            s !== c.TILE_MOUNTAIN ? (this.onTileClick(i, a), (s === this.props.playerIndex || this.props.teams && this.props.teams[s] === this.props.teams[this.props.playerIndex])
+          (s !== c.TILE_MOUNTAIN
+            // begin modified code
+            || freeMoving)
+            // end modified code
+            ? (this.onTileClick(i, a), (s === this.props.playerIndex || this.props.teams && this.props.teams[s] === this.props.teams[this.props.playerIndex])
             // begin modified code
             // && this.onTileClick(i, a),
             // end modified code
@@ -85,6 +119,7 @@ var BetterControls = (function() {
                 var canMove = (curColor === this.props.playerIndex ||
                     (curColor !== -1 && this.props.teams &&
                     this.props.teams[this.props.playerIndex] === this.props.teams[curColor]));
+                var enoughArmy = this.props.map.armyAt(this.state.selectedIndex) >= 2 || this.state.queuedAttacks.length > 0;
                 // end modified code
                 var o = {
                     selectedIndex: -1
@@ -93,7 +128,11 @@ var BetterControls = (function() {
                 o.selectedIndex = r;
                 o.selectedIs50 = !1;
                 // end modified code
-                if (n.isAdjacent(r, this.state.selectedIndex) && r !== this.state.selectedIndex) {
+                if (n.isAdjacent(r, this.state.selectedIndex) && r !== this.state.selectedIndex
+                // begin modified code
+                && enoughArmy && canMove && !freeMoving
+                // end modified code
+                ) {
                     var i = this.state.selectedIndex;
                     s.attack(i, r, this.state.selectedIs50, this.state.attackIndex);
                     Object.assign(o, {
@@ -108,7 +147,7 @@ var BetterControls = (function() {
                 // begin modified code
                 // only set state when jumping or successfully moving
                 // do NOT set state when attempting to queue a move when you don't own selectedIndex yet
-                if (!n.isAdjacent(r, this.state.selectedIndex) || canMove) {
+                if (!n.isAdjacent(r, this.state.selectedIndex) || canMove || freeMoving) {
                     this.setState(o)
                 }
                 //this.setState(o)
@@ -116,6 +155,7 @@ var BetterControls = (function() {
             }
         }
     }
+
     function start() {
         if (running) return; // already runnnig
         if (!(window.GameMap && window.GameMap.isMounted())) return; // not running modified code OR map is old

@@ -36,7 +36,7 @@ var ForceStart = (function() {
         intvl = 0;
     }
     var result = {
-        name: 'SpamForceStart',
+        name: 'AutoForceStart',
         running: function() {
             return intvl !== 0;
         },
