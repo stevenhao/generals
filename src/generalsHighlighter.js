@@ -33,7 +33,7 @@ var GeneralsHighlighter = (function() {
     }
 
     function markCell(cell) {
-        cell.style.outline = '3px dashed red';
+        cell.style.cssText = 'outline: 3px solid red; background-image: url(/crown.png); background-position: center; background-repeat: no-repeat;';
     }
 
     var watchIntvl = 0;
