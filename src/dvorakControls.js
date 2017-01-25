@@ -42,7 +42,9 @@ var DvorakControls = (function() {
     function stop() {
 
       // reassign E to undo
-      m("UNDO").push(69);
+      if (m("UNDO").indexOf(69) === -1) {
+        m("UNDO").push(69);
+      }
       m("RIGHT").splice(m("RIGHT").indexOf(69), 1);
       // don't bother removing other controls as they don't get in the way of anything
 
