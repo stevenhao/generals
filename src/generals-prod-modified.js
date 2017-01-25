@@ -16149,6 +16149,7 @@ console.log('Running modified generals-prod.js');
                     window.c = c;
                     window.T = T;
                     window.m = m;
+                    window.l = l;
                     window.u = u;
                     window.s = s;
                     // end modified code
