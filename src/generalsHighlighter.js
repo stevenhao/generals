@@ -27,6 +27,7 @@ var GeneralsHighlighter = (function() {
                        cell.className.contains('obstacle')) {
                 if (squares.contains(idx)) {
                     squares.remove(idx);
+                    cell.style.cssText = ''; // unhighlight it
                 }
             }
         });
