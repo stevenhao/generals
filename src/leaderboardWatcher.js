@@ -25,7 +25,7 @@ var LeaderboardWatcher = (function() {
 
     function start() {
         if (watchIntvl) {
-             stop();
+            return;
         }
 
         try {
@@ -85,9 +85,15 @@ var LeaderboardWatcher = (function() {
     }
 
     function stop() {
-        clearInterval(watchIntvl);
-        watchIntvl = 0;
-        console.log('no longer watching leaderboard.');
+        if (watchIntvl) {
+            var lb = document.getElementById('game-leaderboard');
+            if (lb) {
+                Array.from(lb.rows).forEach(row => row.deleteCell(2));
+            }
+            clearInterval(watchIntvl);
+            watchIntvl = 0;
+            console.log('no longer watching leaderboard.');
+        }
     }
 
     var result = {
