@@ -23,14 +23,13 @@ var MountainsWatcher = (function() {
             if (cell.className.contains('city')     ||
                 cell.className.contains('mountain') ||
                 cell.className.contains('obstacle')) {
-                result.push(idx);
+                    result.push(idx);
             }
         });
         return result;
     }
 
     var colors = Object.create(null);
-    
     // green looks too similar to darkgreen lol
     function colorFilter(color) {
         if (color == 'green') {
@@ -41,15 +40,15 @@ var MountainsWatcher = (function() {
             return color;
         }
     }
-    
+
     function markCellWhite(cell) {
         cell.style.outline = '3px dashed white';
     }
-    
+
     function markCell(cell) {
         cell.style.outline = '3px dashed ' + getCapturedColor();
     }
-    
+
     function getCapturedColor() {
         var messages = document.getElementsByClassName('server-chat-message');
         // iterate backwards through messages, find first message that matches "A" captured "B."
@@ -64,7 +63,7 @@ var MountainsWatcher = (function() {
         // something went wrong, default to white
         return 'white';
     }
-    
+
     function getTurn() {
         return parseInt(document.getElementById('turn-counter').innerText.split(' ')[1]);
     }
@@ -72,52 +71,49 @@ var MountainsWatcher = (function() {
     var watchIntvl = 0;
     var watchMessagesIntvl = 0;
 
+    var deadGenerals = [];
     function start() {
         if (watchIntvl) {
-             stop();
+            stop();
         }
 
         try {
             var initialMountains = getCityCells();
-            
+            if (initialMountains.length < 10) {
+                console.log('not enough mountains');
+                // avoid highlighting ... everything
+                throw 'gg'; // bad
+            }
             // reset colors first, then get player colors
             colors = Object.create(null);
-            
             var lb = document.getElementsByClassName('leaderboard-name');
-            
             for (var i = 0; i < lb.length; i++) {
                 var player = lb[i].innerHTML;
                 var classes = lb[i].className.split(/[ ]+/);
-                
                 if (player in colors) { // duplicate player name, use white
                     colors[player] = 'white';
                 } else {
                     colors[player] = classes[classes.length - 1];
                 }
             }
-            
             console.log('initial mountains: ', initialMountains);
             console.log('watching mountains...');
         } catch (ex) {
             return;
         }
-        
-        var deadGenerals = [];
 
+        deadGenerals = [];
         watchIntvl = setInterval(function() {
             try {
                 var currentMountains = getCityCells();
                 var newMountains = currentMountains.filter(idx => !initialMountains.contains(idx));
-                
                 // only mark new dead locations
                 var newDeadGenerals = newMountains.filter(idx => !deadGenerals.contains(idx))
                 for (var i = 0; i < newMountains.length; i++) {
                     deadGenerals.push(newDeadGenerals[i]);
                 }
-                
                 var cells = getCells();
                 //        console.log('new mountains:', newMountains);
-                
                 // if more than one general is captured, it is ambiguous and we mark those cells white
                 if (newDeadGenerals.length > 1) {
                     newDeadGenerals.map(idx => cells[idx]).forEach(markCellWhite);
@@ -132,15 +128,14 @@ var MountainsWatcher = (function() {
                 stop();
             }
         }, 500);
-        
         // turns that will result in a dead general due to someone leaving
         var quit_turns = Object.create(null);
         var num_messages = 0;
-        
         watchMessagesIntvl = setInterval(function() {
             try {
                 var re = /(.+)\squit\./;
-                var messages = document.getElementsByClassName('chat-messages-container')[0].children;
+                var chat = document.querySelector('.chat-messages-container');
+                var messages = (chat && chat.children[0]) || [];
 
                 for (var i = num_messages; i < messages.length; i++) {
                     if (messages[i].className === 'chat-message server-chat-message') {
@@ -148,7 +143,7 @@ var MountainsWatcher = (function() {
                         if (matches && matches[1] in colors) {
                             quit_turns[getTurn() + 25] = true;
                         }
-                   }
+                    }
                 }
 
                 num_messages = messages.length;
@@ -159,6 +154,12 @@ var MountainsWatcher = (function() {
     }
 
     function stop() {
+        if (deadGenerals) {
+            var cells = getCells();
+            deadGenerals.forEach(x => {
+                if (cells[x] && cells[x].style) cells[x].style.outline = '';
+            });
+        }
         clearInterval(watchIntvl);
         clearInterval(watchMessagesIntvl);
         watchIntvl = 0;
