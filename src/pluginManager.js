@@ -87,13 +87,16 @@ var Generals = (function() {
     var hideButton = document.createElement('p');
     var pluginButtons = document.createElement('div');
     hideButton.style.cssText = 'cursor:pointer;';
-    hideButton.addEventListener('mousedown', function() {
+    hideButton.addEventListener('mousedown', function(e) {
         if (pluginButtons.style.display === 'none') {
             pluginButtons.style.display = 'block';
         } else {
             pluginButtons.style.display = 'none';
         }
+        e.preventDefault();
+        e.stopPropagation();
     });
+    pluginButtons.style.display = 'none'; // hide by default
     hideButton.innerHTML = '<p style>#swog</p>';
     dashboard.appendChild(pluginButtons);
     dashboard.appendChild(hideButton);

@@ -27,7 +27,9 @@ var DvorakControls = (function() {
 
       // the e key is already reserved for UNDO
       // replace that UNDO with "."
-      m("UNDO").splice(m("UNDO").indexOf(69), 1);
+      while (m("UNDO").indexOf(69) !== -1) {
+        m("UNDO").splice(m("UNDO").indexOf(69), 1);
+      }
       m("UNDO").push(190);
       // assign ; to clear
       m("CLEAR").push(186);
