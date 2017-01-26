@@ -17,6 +17,7 @@
 // begin modified code
 window.FIFTY = [16]; // shiftleft
 window.FREE = [70]; // qwerty-f key. overrides "PING", seems unimportant
+window.TAB = [9]; // qwerty-f key. overrides "PING", seems unimportant
 // end modified code
 
 var BetterControls = (function() {
@@ -24,6 +25,28 @@ var BetterControls = (function() {
     var myGameMap = null;
     var freeMoving = false; // should we reselect squares without attacking?
 
+    function nextCity() {
+        // A) if nothing is selected, jump to general
+        // B) if currently on a city/general, pick next (in row-major order) city/general
+        // C) otherwise, select the nearest city/general to currently selected square
+
+        var myColor = this.props.playerIndex;
+        var myGeneral = this.props.generals[myColor];
+        var myCities = this.props.cities.filter(idx => this.props.map.tileAt(idx) === myColor);
+
+        myCities.push(myGeneral);
+        myCities.sort((a,b) => a-b); // sort by numerical value. for some reason default is base10-lex
+        myCities.push(myCities[0]); // for convenience (avoiding % arith)
+
+        var cur = this.state.selectedIndex;
+        var res = myGeneral;
+        if (cur !== -1) {
+            if (myCities.indexOf(cur) !== -1) {
+                res = myCities[myCities.indexOf(cur) + 1];
+            } // todo: implement the jumping to nearest tower thing?
+        }
+        this.setState({selectedIndex: res, selectedIs50: false});
+    }
     function toggleFreeMoving() {
         freeMoving = !freeMoving;
         document.body.className = freeMoving ? 'freeMoving' : '';
@@ -60,6 +83,10 @@ var BetterControls = (function() {
         if (e.preventDefault(), e.stopPropagation(), m("PING").indexOf(e.keyCode) !== -1) {
             if (!d.hasDuplicate(this.props.teams)) return;
             return void this.enablePingMode()
+        }
+        if (TAB.indexOf(e.keyCode) !== -1) {
+            nextCity.bind(this)();
+            return;
         }
         if (m("UNDO").indexOf(e.keyCode) !== -1) return void this.undoQueuedAttack();
         if (m("CLEAR").indexOf(e.keyCode) !== -1) return void this.clearQueuedAttacks();
