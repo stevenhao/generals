@@ -38,7 +38,6 @@ var AutoPan = (function() {
             intvl = setInterval(function() {
                 var cur = document.querySelector('.selected');
                 var container = document.querySelector('.relative');
-                var page = document.querySelector('#game-page');
                 var map = document.querySelector('#map');
                 if (cur) {
                     var left = cur.offsetLeft,
@@ -47,8 +46,10 @@ var AutoPan = (function() {
                         height = cur.offsetHeight;
                     var cleft = parse(container.style.left);
                     var ctop = parse(container.style.top);
-                    var totalWidth = page.offsetWidth;
-                    var totalHeight = page.offsetHeight;
+                    var containerWidth = container.offsetWidth;
+                    var containerHeight = container.offsetHeight;
+                    var totalWidth = document.body.offsetWidth;
+                    var totalHeight = document.body.offsetHeight;
 
                     var mapWidth = map.offsetWidth;
                     var mapHeight = map.offsetHeight;
@@ -60,15 +61,27 @@ var AutoPan = (function() {
                     // x is position of the top-left corner of selected square on the game page
 
                     if (x < x_l - 1) { // then it is too much to the left. we should move the container to the right a bit.
-                        container.style.left = Math.min(MARGIN, (cleft + Math.min(x_l-x, MAX_SPEED))) + 'px';
+                        var desired = Math.min(MARGIN, (cleft + Math.min(x_l-x, MAX_SPEED)));
+                        if (desired > cleft) {
+                            container.style.left = desired + 'px';
+                        }
                     } else if (x > x_r + 1) { // then it is too much to right
-                        container.style.left = Math.max(totalWidth - mapWidth-MARGIN, cleft - Math.min(x-x_r, MAX_SPEED)) + 'px';
+                        var desired = Math.max(totalWidth - mapWidth-MARGIN, cleft - Math.min(x-x_r, MAX_SPEED));
+                        if (desired < cleft) {
+                            container.style.left = desired + 'px';
+                        }
                     }
 
                     if (y < y_l - 1) {
-                        container.style.top = Math.min(MARGIN, ctop + Math.min(y_l-y, MAX_SPEED)) + 'px';
+                        var desired = Math.min(MARGIN, ctop + Math.min(y_l-y, MAX_SPEED));
+                        if (desired > ctop) {
+                            container.style.top = desired + 'px';
+                        }
                     } else if (y > y_r + 1) {
-                        container.style.top = Math.max(totalHeight - mapHeight-MARGIN, ctop - Math.min(y-y_r, MAX_SPEED)) + 'px';
+                        var desired = Math.max(totalHeight - mapHeight - MARGIN, ctop - Math.min(y - y_r, MAX_SPEED));
+                        if (desired < ctop) { // only allow movements up (decreasing ctop)
+                            container.style.top = desired + 'px';
+                        }
                     }
                 }
             }, 20);
