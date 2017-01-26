@@ -83,8 +83,20 @@ var Generals = (function() {
     var mounted = false;
     var plugins = []; // the dashboard doubles as a plugin manager
     var dashboard = document.createElement('div');
-    dashboard.style.cssText = 'z-index: 11; position: absolute; right: 20px; bottom: 30px; width: 200px; height: 300px; outline: 5px solid #252525; text-align: center;';
-    dashboard.innerHTML = '<p>#swog</p>';
+    dashboard.style.cssText = 'z-index: 11; position: absolute; right: 20px; bottom: 30px; width: 200px; max-height:500px; outline: 5px solid #252525; text-align: center;';
+    var hideButton = document.createElement('p');
+    var pluginButtons = document.createElement('div');
+    hideButton.style.cssText = 'cursor:pointer;';
+    hideButton.addEventListener('mousedown', function() {
+        if (pluginButtons.style.display === 'none') {
+            pluginButtons.style.display = 'block';
+        } else {
+            pluginButtons.style.display = 'none';
+        }
+    });
+    hideButton.innerHTML = '<p style>#swog</p>';
+    dashboard.appendChild(pluginButtons);
+    dashboard.appendChild(hideButton);
 
     // only call this when Generals && Generals.ready() is true.
     function addPlugin(plugin) {
@@ -123,8 +135,8 @@ var Generals = (function() {
             }
         }, 1000);
 
-        dashboard.appendChild(button);
-        dashboard.appendChild(checkbox);
+        pluginButtons.appendChild(button);
+        pluginButtons.appendChild(checkbox);
     }
 
     function mount() {
