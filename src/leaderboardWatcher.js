@@ -37,7 +37,7 @@ var LeaderboardWatcher = (function() {
             }
             var army = [];
             var army_index;
-            var player_index;
+            var player_index = 0; // in case of minimized leaderboard
             for (i = 0; i < lb.rows[0].cells.length; ++i) {
                 if (lb.rows[0].cells[i].innerText == 'Player') {
                     player_index = i;
@@ -59,26 +59,42 @@ var LeaderboardWatcher = (function() {
 
         watchIntvl = setInterval(function() {
             try {
+                var delta_index = 2;
+                var army_index;
+                var player_index = 0; // in case of minimized leaderboard
+                var lb = document.getElementById('game-leaderboard');
+                for (i = 0; i < lb.rows[0].cells.length; ++i) {
+                    if (lb.rows[0].cells[i].innerHTML == "Δ") {
+                        delta_index = i;
+                    } else if (lb.rows[0].cells[i].innerText == 'Army') {
+                        army_index = i;
+                    } else if (lb.rows[0].cells[i].innerText == 'Player') {
+                        player_index = i;
+                    }
+                }
+                console.log('delta idx', delta_index);
                 if (getTurn() != curTurn) {
                     for (var i = 1; i < lb.rows.length; ++i) {
                         var name= lb.rows[i].cells[player_index].className;
                         var new_army = parseInt(lb.rows[i].cells[army_index].innerText);
                         var delta = new_army - army[name];
+                        var cell = lb.rows[i].cells[delta_index];
                         if (delta > 0) {
-                            lb.rows[i].cells[2].style.backgroundColor = 'yellowgreen';
+                            cell.style.backgroundColor = 'yellowgreen';
                         }
                         else if (delta < -40) {
-                            lb.rows[i].cells[2].style.backgroundColor = 'red';
+                            cell.style.backgroundColor = 'red';
                         }
                         else {
-                            lb.rows[i].cells[2].style.backgroundColor = 'pink';
+                            cell.style.backgroundColor = 'pink';
                         }
-                        lb.rows[i].cells[2].innerText = delta;
+                        cell.innerText = delta;
                         army[name] = new_army;
                     }
                     curTurn = getTurn();
                 }
             } catch(ex) {
+                throw ex;
                 stop();
             }
         }, 250);
