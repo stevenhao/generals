@@ -20,6 +20,60 @@ var LeaderboardWatcher = (function() {
         return document.getElementById('turn-counter').innerText.split(' ')[1];
     }
 
+    function getTitles() {
+        var lb = document.getElementById('game-leaderboard');
+        return Array.from(lb.rows[0].children).map(x => x.innerHTML);
+    }
+
+    function isMinimized() {
+        var titles = getTitles();
+        return titles[0] === ' ';
+    }
+
+    function removeDeltaColumn() {
+        var lb = document.getElementById('game-leaderboard');
+        var titles = getTitles();
+        var deltaIdx = titles.indexOf("Δ");
+        if (deltaIdx == -1) return;
+        Array.from(lb.rows)
+            .forEach(row => row.deleteCell(deltaIdx));
+    }
+
+    function addDeltaColumn() {
+        var lb = document.getElementById('game-leaderboard');
+        var titles = getTitles();
+        var deltaIdx = titles.indexOf("Δ");
+        if (deltaIdx !== -1) return;
+
+        deltaIdx = isMinimized() ? 1 : 2;
+        var titleCell = lb.rows[0].insertCell(deltaIdx);
+        titleCell.innerHTML = '&Delta;';
+        titleCell.clasSName = 'delta';
+
+        Array.from(lb.rows).slice(1)
+            .forEach(x => x.insertCell(deltaIdx));
+    }
+
+    function getArmies() {
+        var lb = document.getElementById('game-leaderboard');
+        var titles = getTitles();
+        var armyIdx = titles.indexOf("Army");
+        var nameIdx = isMinimized() ? 0 : 1;
+        if (armyIdx === -1 || nameIdx === -1) {
+            throw new Exception('cannot find army title', titles);
+        }
+
+        var nums = Array.from(lb.rows).slice(1)
+            .map(x => parseInt(x.children[armyIdx].textContent));
+        var names = Array.from(lb.rows).slice(1)
+            .map(x => x.children[nameIdx].className);
+        var armies = {};
+        nums.forEach((num, idx) => {
+            armies[names[idx]] = num;
+        });
+        return armies;
+    }
+
     var watchIntvl = 0;
     var watchMessagesIntvl = 0;
 
@@ -27,74 +81,39 @@ var LeaderboardWatcher = (function() {
         if (watchIntvl) {
             return;
         }
+        var lb = document.getElementById('game-leaderboard');
+        if (!lb) return; // cannot start yet
 
-        try {
-            var lb = document.getElementById('game-leaderboard');
-
-            lb.rows[0].insertCell(2).innerHTML = '&Delta;';
-            for (var i = 1; i < lb.rows.length; ++i) {
-                lb.rows[i].insertCell(2);
-            }
-            var army = [];
-            var army_index;
-            var player_index = 0; // in case of minimized leaderboard
-            for (i = 0; i < lb.rows[0].cells.length; ++i) {
-                if (lb.rows[0].cells[i].innerText == 'Player') {
-                    player_index = i;
-                }
-                if (lb.rows[0].cells[i].innerText == 'Army') {
-                    army_index = i;
-                }
-            }
-            for (i = 1; i < lb.rows.length; ++i) {
-                var name= lb.rows[i].cells[player_index].className;
-                army[name] = parseInt(lb.rows[i].cells[army_index].innerText);
-            }
-            console.log('watching leaderboard...');
-        } catch (ex) {
-            return;
-        }
-
-        var curTurn = getTurn();
-
+        var turn = '';
+        var armies = {};
         watchIntvl = setInterval(function() {
             try {
-                var delta_index = 2;
-                var army_index;
-                var player_index = 0; // in case of minimized leaderboard
-                var lb = document.getElementById('game-leaderboard');
-                for (i = 0; i < lb.rows[0].cells.length; ++i) {
-                    if (lb.rows[0].cells[i].innerHTML == "Δ") {
-                        delta_index = i;
-                    } else if (lb.rows[0].cells[i].innerText == 'Army') {
-                        army_index = i;
-                    } else if (lb.rows[0].cells[i].innerText == 'Player') {
-                        player_index = i;
-                    }
+                if (getTurn() === turn) {
+                    return;
                 }
-                console.log('delta idx', delta_index);
-                if (getTurn() != curTurn) {
-                    for (var i = 1; i < lb.rows.length; ++i) {
-                        var name= lb.rows[i].cells[player_index].className;
-                        var new_army = parseInt(lb.rows[i].cells[army_index].innerText);
-                        var delta = new_army - army[name];
-                        var cell = lb.rows[i].cells[delta_index];
-                        if (delta > 0) {
-                            cell.style.backgroundColor = 'yellowgreen';
-                        }
-                        else if (delta < -40) {
-                            cell.style.backgroundColor = 'red';
-                        }
-                        else {
-                            cell.style.backgroundColor = 'pink';
-                        }
-                        cell.innerText = delta;
-                        army[name] = new_army;
-                    }
-                    curTurn = getTurn();
-                }
+                turn = getTurn();
+                var newArmies = getArmies();
+
+                addDeltaColumn();
+
+                lb = document.getElementById('game-leaderboard');
+                var titles = getTitles();
+                var deltaIdx = titles.indexOf("Δ");
+                var nameIdx = isMinimized() ? 0 : 1;
+                Array.from(lb.rows).slice(1)
+                    .forEach(row => {
+                        var name = row.children[nameIdx].className;
+                        var delta = newArmies[name] - (armies[name] || 0);
+                        var cell = row.children[deltaIdx];
+                        cell.style.backgroundColor = (delta > 0) ?
+                            'yellowgreen' :
+                            (delta <= -30) ?
+                            'red' :
+                            'pink';
+                        cell.innerHTML = delta;
+                    });
+                armies = newArmies;
             } catch(ex) {
-                throw ex;
                 stop();
             }
         }, 250);
@@ -102,13 +121,9 @@ var LeaderboardWatcher = (function() {
 
     function stop() {
         if (watchIntvl) {
-            var lb = document.getElementById('game-leaderboard');
-            if (lb) {
-                Array.from(lb.rows).forEach(row => row.deleteCell(2));
-            }
+            removeDeltaColumn();
             clearInterval(watchIntvl);
             watchIntvl = 0;
-            console.log('no longer watching leaderboard.');
         }
     }
 
