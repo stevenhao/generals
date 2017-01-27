@@ -25,7 +25,7 @@ var BetterControls = (function() {
     var myGameMap = null;
     var freeMoving = false; // should we reselect squares without attacking?
 
-    function nextCity() {
+    function nextCity(backwards) {
         // A) if nothing is selected, jump to general
         // B) if currently on a city/general, pick next (in row-major order) city/general
         // C) otherwise, select the nearest city/general to currently selected square
@@ -35,7 +35,11 @@ var BetterControls = (function() {
         var myCities = this.props.cities.filter(idx => this.props.map.tileAt(idx) === myColor);
 
         myCities.push(myGeneral);
-        myCities.sort((a,b) => a-b); // sort by numerical value. for some reason default is base10-lex
+        if (backwards) {
+            myCities.sort((a,b) => b-a); // sort backwards.
+        } else {
+            myCities.sort((a,b) => a-b); // for some reason this isn't the default behavior of sort()
+        }
         myCities.push(myCities[0]); // for convenience (avoiding % arith)
 
         var cur = this.state.selectedIndex;
@@ -59,14 +63,21 @@ var BetterControls = (function() {
     }
     addFreemovingStyle();
 
+    function onKeyUp(e) {
+        if (FIFTY.indexOf(e.keyCode) !== -1) {
+            this.setState({selectedIs50: false});
+            return;
+        }
+    }
+
     function onKeyDown(e) {
         // begin modified code
         if (e.metaKey) return; // allow command-r to refresh, etc
+        //console.log(e.keyCode);
         if (FIFTY.indexOf(e.keyCode) !== -1) {
-            this.setState({selectedIs50: !this.state.selectedIs50});
+            this.setState({selectedIs50: true});
             return;
         }
-        console.log(e.keyCode);
         if (FREE.indexOf(e.keyCode) !== -1) {
             toggleFreeMoving();
             return;
@@ -85,7 +96,7 @@ var BetterControls = (function() {
             return void this.enablePingMode()
         }
         if (TAB.indexOf(e.keyCode) !== -1) {
-            nextCity.bind(this)();
+            nextCity.bind(this)(e.shiftKey);
             return;
         }
         if (m("UNDO").indexOf(e.keyCode) !== -1) return void this.undoQueuedAttack();
@@ -190,7 +201,9 @@ var BetterControls = (function() {
 
         window.removeEventListener("keydown", myGameMap.onKeyDown);
         myGameMap.onKeyDown = onKeyDown.bind(myGameMap);
+        myGameMap.onKeyUp = onKeyUp.bind(myGameMap);
         window.addEventListener("keydown", myGameMap.onKeyDown);
+        window.addEventListener("keyup", myGameMap.onKeyUp);
         myGameMap.onTileClick = onTileClick;
         running = true;
         setInterval(function() {
