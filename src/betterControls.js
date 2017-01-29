@@ -23,7 +23,6 @@ window.TAB = [9]; // qwerty-f key. overrides "PING", seems unimportant
 var BetterControls = (function() {
     var running = false;
     var myGameMap = null;
-    var freeMoving = false; // should we reselect squares without attacking?
 
     function nextCity(backwards) {
         // A) if nothing is selected, jump to general
@@ -51,17 +50,6 @@ var BetterControls = (function() {
         }
         this.setState({selectedIndex: res, selectedIs50: false});
     }
-    function toggleFreeMoving() {
-        freeMoving = !freeMoving;
-        document.body.className = freeMoving ? 'freeMoving' : '';
-    }
-
-    function addFreemovingStyle() {
-        var style = document.createElement('style');
-        style.innerHTML = '.freeMoving #map td.selected { opacity: .50; }';
-        document.body.appendChild(style);
-    }
-    addFreemovingStyle();
 
     function onKeyUp(e) {
         if (FIFTY.indexOf(e.keyCode) !== -1) {
@@ -73,13 +61,8 @@ var BetterControls = (function() {
     function onKeyDown(e) {
         // begin modified code
         if (e.metaKey) return; // allow command-r to refresh, etc
-        //console.log(e.keyCode);
         if (FIFTY.indexOf(e.keyCode) !== -1) {
             this.setState({selectedIs50: true});
-            return;
-        }
-        if (FREE.indexOf(e.keyCode) !== -1) {
-            toggleFreeMoving();
             return;
         }
         // end modified code
@@ -95,10 +78,12 @@ var BetterControls = (function() {
             if (!d.hasDuplicate(this.props.teams)) return;
             return void this.enablePingMode()
         }
+        // begin modified code
         if (TAB.indexOf(e.keyCode) !== -1) {
             nextCity.bind(this)(e.shiftKey);
             return;
         }
+        // end modified code
         if (m("UNDO").indexOf(e.keyCode) !== -1) return void this.undoQueuedAttack();
         if (m("CLEAR").indexOf(e.keyCode) !== -1) return void this.clearQueuedAttacks();
         if (m("DESELECT").indexOf(e.keyCode) !== -1) return void this.setState({
@@ -121,19 +106,7 @@ var BetterControls = (function() {
             var i = t + r,
                 a = n + o,
                 s = this.props.map.tileAt(this.props.map.indexFrom(i, a));
-          (s !== c.TILE_MOUNTAIN
-            // begin modified code
-            || freeMoving)
-            // end modified code
-            ? (this.onTileClick(i, a), (s === this.props.playerIndex || this.props.teams && this.props.teams[s] === this.props.teams[this.props.playerIndex])
-            // begin modified code
-            // && this.onTileClick(i, a),
-            // end modified code
-            ,u.onWASD && u.onWASD()) : this.setState({
-                // begin modified code
-                // selectedIndex: -1
-                // end modified code
-            })
+            s !== c.TILE_MOUNTAIN && c.TILE_FOG_OBSTACLE && (this.onTileClick(i, a), u.onWASD && u.onWASD())
         }
     }
 
@@ -153,10 +126,8 @@ var BetterControls = (function() {
             });
             else {
                 // begin modified code
-                var curColor = this.props.map.tileAt(this.state.selectedIndex);
-                var canMove = (curColor === this.props.playerIndex ||
-                    (curColor !== -1 && this.props.teams &&
-                    this.props.teams[this.props.playerIndex] === this.props.teams[curColor]));
+                var nextColor = this.props.map.tileAt(r);
+                var canMove = (nextColor !== c.TILE_MOUNTAIN && nextColor !== c.TILE_FOG_OBSTACLE);
                 var enoughArmy = this.props.map.armyAt(this.state.selectedIndex) >= 2 || this.state.queuedAttacks.length > 0;
                 // end modified code
                 var o = {
@@ -168,7 +139,7 @@ var BetterControls = (function() {
                 // end modified code
                 if (n.isAdjacent(r, this.state.selectedIndex) && r !== this.state.selectedIndex
                 // begin modified code
-                && enoughArmy && canMove && !freeMoving
+                && enoughArmy && canMove
                 // end modified code
                 ) {
                     var i = this.state.selectedIndex;
@@ -185,7 +156,7 @@ var BetterControls = (function() {
                 // begin modified code
                 // only set state when jumping or successfully moving
                 // do NOT set state when attempting to queue a move when you don't own selectedIndex yet
-                if (!n.isAdjacent(r, this.state.selectedIndex) || canMove || freeMoving) {
+                if (!n.isAdjacent(r, this.state.selectedIndex) || canMove) {
                     this.setState(o)
                 }
                 //this.setState(o)
