@@ -51,4 +51,4 @@ To enable experimental features, you must
 
 You can use TamperMonkey to load generals-prod-modified as usual.
 
-You can use AdBlock to block generals-prod.js: add the line `generals-bundle` to your filters, in AdBlock options.
+You can use AdBlock to block generals-main-prod-vXX.X.X.js: add the line `generals-main-*.js` to your custom filters, in AdBlock options.
