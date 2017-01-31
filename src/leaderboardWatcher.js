@@ -32,6 +32,7 @@ var LeaderboardWatcher = (function() {
 
     function removeDeltaColumn() {
         var lb = document.getElementById('game-leaderboard');
+        if (!lb) return;
         var titles = getTitles();
         var deltaIdx = titles.indexOf("Δ");
         if (deltaIdx == -1) return;
