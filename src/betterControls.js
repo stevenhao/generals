@@ -66,16 +66,24 @@ var BetterControls = (function() {
             return;
         }
         // end modified code
-        if (this.state.inPingMode) return void this.disablePingMode();
-        if (m("ZOOMIN").indexOf(e.keyCode) !== -1) return void(this.state.zoom > y && this.setState({
-            zoom: this.state.zoom - 1
-        }));
-        if (m("ZOOMOUT").indexOf(e.keyCode) !== -1) return void(this.state.zoom < T && this.setState({
-            zoom: this.state.zoom + 1
-        }));
-        if (this.props.isReplay) return void(m("AUTOPLAY").indexOf(e.keyCode) !== -1 ? this.props.toggleAutoPlay() : m("RIGHT").indexOf(e.keyCode) !== -1 ? l.nextReplayTurn() : m("LEFT").indexOf(e.keyCode) !== -1 && l.backReplay());
-        if (e.preventDefault(), e.stopPropagation(), m("PING").indexOf(e.keyCode) !== -1) {
-            if (!d.hasDuplicate(this.props.teams)) return;
+        var t = "enable" == f.old_movement;
+        if (this.state.inPingMode)
+            return void this.disablePingMode();
+        if (m("ZOOMIN").indexOf(e.keyCode) !== -1)
+            return void (this.state.zoom > y && this.setState({
+                zoom: this.state.zoom - 1
+            }));
+        if (m("ZOOMOUT").indexOf(e.keyCode) !== -1)
+            return void (this.state.zoom < T && this.setState({
+                zoom: this.state.zoom + 1
+            }));
+        if (this.props.isReplay)
+            return void (m("AUTOPLAY").indexOf(e.keyCode) !== -1 ? this.props.toggleAutoPlay() : m("RIGHT").indexOf(e.keyCode) !== -1 ? u.nextReplayTurn() : m("LEFT").indexOf(e.keyCode) !== -1 && u.backReplay());
+        if (e.preventDefault(),
+        e.stopPropagation(),
+        !this.props.isReplay && m("PING").indexOf(e.keyCode) !== -1) {
+            if (!d.hasDuplicate(this.props.teams))
+                return;
             return void this.enablePingMode()
         }
         // begin modified code
@@ -84,29 +92,48 @@ var BetterControls = (function() {
             return;
         }
         // end modified code
-        if (m("UNDO").indexOf(e.keyCode) !== -1) return void this.undoQueuedAttack();
-        if (m("CLEAR").indexOf(e.keyCode) !== -1) return void this.clearQueuedAttacks();
-        if (m("DESELECT").indexOf(e.keyCode) !== -1) return void this.setState({
-            selectedIndex: -1
-        });
-        if (m("CHAT").indexOf(e.keyCode) !== -1) return void this.props.focusChat(!1);
-        if (m("TEAMCHAT").indexOf(e.keyCode) !== -1) return void this.props.focusChat(!0);
-        if (!(this.state.selectedIndex < 0)) {
-            var t = Math.floor(this.state.selectedIndex / this.props.map.width),
-                n = this.state.selectedIndex % this.props.map.width,
-                r = 0,
-                o = 0;
-            if (m("LEFT").indexOf(e.keyCode) !== -1) o = -1;
-            else if (m("UP").indexOf(e.keyCode) !== -1) r = -1;
-            else if (m("RIGHT").indexOf(e.keyCode) !== -1) o = 1;
+        if (m("UNDO").indexOf(e.keyCode) !== -1)
+            return void this.undoQueuedAttack();
+        if (m("CLEAR").indexOf(e.keyCode) !== -1)
+            return void this.clearQueuedAttacks();
+        if (m("DESELECT").indexOf(e.keyCode) !== -1)
+            return void this.setState({
+                selectedIndex: -1
+            });
+        if (m("CHAT").indexOf(e.keyCode) !== -1)
+            return void this.props.focusChat(!1);
+        if (m("TEAMCHAT").indexOf(e.keyCode) !== -1)
+            return void this.props.focusChat(!0);
+        if (m("TOGGLE_MOVEMENT").indexOf(e.keyCode) !== -1 && (f.old_movement = "enable" == f.old_movement ? "disable" : "enable"),
+        !(this.state.selectedIndex < 0)) {
+            var n = Math.floor(this.state.selectedIndex / this.props.map.width)
+              , r = this.state.selectedIndex % this.props.map.width
+              , o = 0
+              , i = 0;
+            if (m("LEFT").indexOf(e.keyCode) !== -1)
+                i = -1;
+            else if (m("UP").indexOf(e.keyCode) !== -1)
+                o = -1;
+            else if (m("RIGHT").indexOf(e.keyCode) !== -1)
+                i = 1;
             else {
-                if (m("DOWN").indexOf(e.keyCode) === -1) return;
-                r = 1
+                if (m("DOWN").indexOf(e.keyCode) === -1)
+                    return;
+                o = 1
             }
-            var i = t + r,
-                a = n + o,
-                s = this.props.map.tileAt(this.props.map.indexFrom(i, a));
-            s !== c.TILE_MOUNTAIN && c.TILE_FOG_OBSTACLE && (this.onTileClick(i, a), u.onWASD && u.onWASD())
+            var a = n + o
+              , s = r + i
+              , p = this.props.map.tileAt(this.props.map.indexFrom(a, s));
+            p !== l.TILE_MOUNTAIN ? (this.onTileClick(a, s),
+                t && (p === this.props.playerIndex || this.props.teams && this.props.teams[p] === this.props.teams[this.props.playerIndex])
+                // begin modified code
+                // this line must be commented out to prevent 50%-moves when moving in your own territory
+                // && this.onTileClick(a, s)
+                // end modified code
+                ,
+            c.onWASD && c.onWASD()) : t && this.setState({
+                selectedIndex: -1
+            })
         }
     }
 
