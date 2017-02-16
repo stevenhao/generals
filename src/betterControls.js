@@ -70,15 +70,21 @@ var BetterControls = (function() {
         if (this.state.inPingMode)
             return void this.disablePingMode();
         if (m("ZOOMIN").indexOf(e.keyCode) !== -1)
-            return void (this.state.zoom > y && this.setState({
+            return void (this.state.zoom > g && this.setState({
                 zoom: this.state.zoom - 1
             }));
         if (m("ZOOMOUT").indexOf(e.keyCode) !== -1)
             return void (this.state.zoom < T && this.setState({
                 zoom: this.state.zoom + 1
             }));
+        // begin modified code
+        if (TAB.indexOf(e.keyCode) !== -1) {
+            nextCity.bind(this)(e.shiftKey);
+            return;
+        }
+        // end modified code
         if (this.props.isReplay)
-            return void (m("AUTOPLAY").indexOf(e.keyCode) !== -1 ? this.props.toggleAutoPlay() : m("RIGHT").indexOf(e.keyCode) !== -1 ? u.nextReplayTurn() : m("LEFT").indexOf(e.keyCode) !== -1 && u.backReplay());
+            return void (m("AUTOPLAY").indexOf(e.keyCode) !== -1 ? this.props.toggleAutoPlay() : m("RIGHT").indexOf(e.keyCode) !== -1 ? c.nextReplayTurn() : m("LEFT").indexOf(e.keyCode) !== -1 && c.backReplay());
         if (e.preventDefault(),
         e.stopPropagation(),
         !this.props.isReplay && m("PING").indexOf(e.keyCode) !== -1) {
@@ -86,12 +92,6 @@ var BetterControls = (function() {
                 return;
             return void this.enablePingMode()
         }
-        // begin modified code
-        if (TAB.indexOf(e.keyCode) !== -1) {
-            nextCity.bind(this)(e.shiftKey);
-            return;
-        }
-        // end modified code
         if (m("UNDO").indexOf(e.keyCode) !== -1)
             return void this.undoQueuedAttack();
         if (m("CLEAR").indexOf(e.keyCode) !== -1)
@@ -104,8 +104,7 @@ var BetterControls = (function() {
             return void this.props.focusChat(!1);
         if (m("TEAMCHAT").indexOf(e.keyCode) !== -1)
             return void this.props.focusChat(!0);
-        if (m("TOGGLE_MOVEMENT").indexOf(e.keyCode) !== -1 && (f.old_movement = "enable" == f.old_movement ? "disable" : "enable"),
-        !(this.state.selectedIndex < 0)) {
+        if (!(this.state.selectedIndex < 0)) {
             var n = Math.floor(this.state.selectedIndex / this.props.map.width)
               , r = this.state.selectedIndex % this.props.map.width
               , o = 0
@@ -125,70 +124,10 @@ var BetterControls = (function() {
               , s = r + i
               , p = this.props.map.tileAt(this.props.map.indexFrom(a, s));
             p !== l.TILE_MOUNTAIN ? (this.onTileClick(a, s),
-                t && (p === this.props.playerIndex || this.props.teams && this.props.teams[p] === this.props.teams[this.props.playerIndex])
-                // begin modified code
-                // this line must be commented out to prevent 50%-moves when moving in your own territory
-                // && this.onTileClick(a, s)
-                // end modified code
-                ,
-            c.onWASD && c.onWASD()) : t && this.setState({
+            t && (p === this.props.playerIndex || this.props.teams && this.props.teams[p] === this.props.teams[this.props.playerIndex]) && this.onTileClick(a, s),
+            u.onWASD && u.onWASD()) : t && this.setState({
                 selectedIndex: -1
             })
-        }
-    }
-
-    function onTileClick(e, t) {
-        var n = this.props.map;
-        if (!(e < 0 || t < 0 || e >= n.height || t >= n.width)) {
-            var r = n.indexFrom(e, t);
-            if (this.state.inPingMode) this.pingTile(r), this.disablePingMode();
-            else if (this.state.selectedIndex < 0) this.setState({
-                selectedIndex: n.indexFrom(e, t),
-                selectedIs50: !1
-            });
-            else if (this.state.selectedIndex === r) this.state.selectedIs50 ? this.setState({
-                selectedIndex: -1
-            }) : this.setState({
-                selectedIs50: !0
-            });
-            else {
-                // begin modified code
-                var nextColor = this.props.map.tileAt(r);
-                var canMove = (nextColor !== c.TILE_MOUNTAIN && nextColor !== c.TILE_FOG_OBSTACLE);
-                var enoughArmy = this.props.map.armyAt(this.state.selectedIndex) >= 2 || this.state.queuedAttacks.length > 0;
-                // end modified code
-                var o = {
-                    selectedIndex: -1
-                };
-                // begin modified code
-                o.selectedIndex = r;
-                o.selectedIs50 = !1;
-                // end modified code
-                if (n.isAdjacent(r, this.state.selectedIndex) && r !== this.state.selectedIndex
-                // begin modified code
-                && enoughArmy && canMove
-                // end modified code
-                ) {
-                    var i = this.state.selectedIndex;
-                    s.attack(i, r, this.state.selectedIs50, this.state.attackIndex);
-                    Object.assign(o, {
-                        queuedAttacks: this.state.queuedAttacks.concat([{
-                            attackIndex: this.state.attackIndex,
-                            begin: i,
-                            end: r
-                        }]),
-                        attackIndex: this.state.attackIndex + 1
-                    })
-                }
-                // begin modified code
-                // only set state when jumping or successfully moving
-                // do NOT set state when attempting to queue a move when you don't own selectedIndex yet
-                if (!n.isAdjacent(r, this.state.selectedIndex) || canMove) {
-                    this.setState(o)
-                }
-                //this.setState(o)
-                // end modified code
-            }
         }
     }
 
@@ -202,7 +141,6 @@ var BetterControls = (function() {
         myGameMap.onKeyUp = onKeyUp.bind(myGameMap);
         window.addEventListener("keydown", myGameMap.onKeyDown);
         window.addEventListener("keyup", myGameMap.onKeyUp);
-        myGameMap.onTileClick = onTileClick;
         running = true;
         setInterval(function() {
             if (!myGameMap.isMounted()) {
